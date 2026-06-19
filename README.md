@@ -1,5 +1,11 @@
 # pydynantic
 
+[![PyPI version](https://img.shields.io/pypi/v/pydynantic.svg)](https://pypi.org/project/pydynantic/)
+[![Python versions](https://img.shields.io/pypi/pyversions/pydynantic.svg)](https://pypi.org/project/pydynantic/)
+[![CI](https://github.com/robertruben98/pydynantic/actions/workflows/ci.yml/badge.svg)](https://github.com/robertruben98/pydynantic/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/robertruben98/pydynantic/blob/main/LICENSE)
+[![Typed](https://img.shields.io/badge/typed-mypy%20strict-blue.svg)](https://mypy.readthedocs.io/)
+
 **Single-table design for DynamoDB in Python, with typed entities on top of Pydantic v2.**
 
 `pydynantic` is the Pythonic answer to JavaScript's [ElectroDB](https://electrodb.dev/)
