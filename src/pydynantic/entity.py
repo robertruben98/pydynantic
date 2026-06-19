@@ -31,6 +31,7 @@ from .marshalling import Item, deserialize_item, serialize, serialize_item
 from .query import QueryNamespace
 
 if TYPE_CHECKING:
+    from .query import ScanBuilder
     from .table import Table
 
 #: Reserved attribute used to discriminate entities when deserializing.
@@ -109,9 +110,7 @@ class EntityMeta(ModelMetaclass):
                 keys[attr_name] = value
                 if value.index is None:
                     if primary is not None:
-                        raise KeyTemplateError(
-                            f"{cls_name}: more than one primary key declared"
-                        )
+                        raise KeyTemplateError(f"{cls_name}: more than one primary key declared")
                     primary = value
 
         if primary is None:
@@ -121,8 +120,7 @@ class EntityMeta(ModelMetaclass):
         cls.__primary_key__ = primary
         cls.__key_attrs__ = list(
             dict.fromkeys(
-                template_fields(primary.pk_template)
-                + template_fields(primary.sk_template or "")
+                template_fields(primary.pk_template) + template_fields(primary.sk_template or "")
             )
         )
 
@@ -207,10 +205,10 @@ class Entity(BaseModel, metaclass=EntityMeta):
     @classmethod
     def put(cls, item: Self, *, condition: Condition | None = None) -> Self:
         """Create or replace an item. Supports optimistic locking and conditions."""
-        versioned = cls.__version_field__ is not None
-        if versioned:
-            version_field = cls.__version_field__
-            assert version_field is not None
+        version_field = cls.__version_field__
+        versioned = version_field is not None
+        current = 0
+        if version_field is not None:
             current = getattr(item, version_field)
             setattr(item, version_field, current + 1)
             lock = attr_not_exists(cls.__primary_key__.pk_attr) | (F(version_field) == current)
@@ -226,17 +224,37 @@ class Entity(BaseModel, metaclass=EntityMeta):
         try:
             cls._client().put_item(**params)
         except ClientError as exc:
+            if version_field is not None:
+                # The write never landed; undo the in-memory bump so the caller's
+                # object still reflects the stored version and can be retried.
+                setattr(item, version_field, current)
             raise map_client_error(exc, versioned=versioned) from exc
         return item
 
     @classmethod
-    def get(cls, *, consistent: bool = False, **key_attrs: Any) -> Self | None:
-        """Fetch an item by its primary key, or ``None`` if it does not exist."""
-        response = cls._client().get_item(
-            TableName=cls._table_name(),
-            Key=cls.build_key(key_attrs),
-            ConsistentRead=consistent,
-        )
+    def get(
+        cls,
+        *,
+        consistent: bool = False,
+        attributes: list[str] | None = None,
+        **key_attrs: Any,
+    ) -> Self | None:
+        """Fetch an item by its primary key, or ``None`` if it does not exist.
+
+        ``attributes`` limits the response to a projection of attribute paths;
+        omitted fields fall back to their model defaults (or fail validation if
+        required), so include everything the entity needs to construct.
+        """
+        params: dict[str, Any] = {
+            "TableName": cls._table_name(),
+            "Key": cls.build_key(key_attrs),
+            "ConsistentRead": consistent,
+        }
+        if attributes:
+            context = ExpressionContext()
+            params["ProjectionExpression"] = ", ".join(context.name(a) for a in attributes)
+            params["ExpressionAttributeNames"] = context.names
+        response = cls._client().get_item(**params)
         item = response.get("Item")
         if not item:
             return None
@@ -296,10 +314,16 @@ class Entity(BaseModel, metaclass=EntityMeta):
         for key_def in cls.__keys__.values():
             if key_def.index is None:
                 continue
-            if key_def.referenced_fields & set_items.keys() and key_def.referenced_fields.issubset(
-                known
-            ):
-                set_items.update(key_def.key_attributes(known))
+            if not key_def.referenced_fields & set_items.keys():
+                continue
+            if not key_def.referenced_fields.issubset(known):
+                missing = sorted(key_def.referenced_fields - known.keys())
+                raise PydynanticError(
+                    f"update() changes attribute(s) feeding index {key_def.name!r} but "
+                    f"cannot recompute its key: also pass {missing} in set= so the index "
+                    f"stays consistent."
+                )
+            set_items.update(key_def.key_attributes(known))
 
         version_field = cls.__version_field__
         add_items: dict[str, Any] = dict(add or {})
@@ -363,3 +387,16 @@ class Entity(BaseModel, metaclass=EntityMeta):
         from .batch import batch_write
 
         batch_write(cls, puts=puts, deletes=deletes)
+
+    # -- scan (delegates to the query module) -------------------------------
+    @classmethod
+    def scan(cls) -> ScanBuilder[Self]:
+        """Return a builder for a full-table scan restricted to this entity.
+
+        A scan reads the whole table; the builder automatically filters on the
+        ``__entity__`` discriminator so only this entity's items are returned.
+        Prefer :attr:`query` whenever a key condition applies.
+        """
+        from .query import ScanBuilder
+
+        return ScanBuilder(cls)

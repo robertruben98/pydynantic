@@ -20,7 +20,7 @@ from .errors import (
 from .expressions import Condition, F, attr_exists, attr_not_exists
 from .keys import KeyDefinition, key
 from .pagination import Page, decode_cursor, encode_cursor
-from .query import QueryBuilder, QueryNamespace
+from .query import QueryBuilder, QueryNamespace, ScanBuilder
 from .table import Index, Table
 from .transactions import Transaction, transaction
 
@@ -43,6 +43,7 @@ __all__ = [
     # Query / pagination
     "QueryBuilder",
     "QueryNamespace",
+    "ScanBuilder",
     "Page",
     "encode_cursor",
     "decode_cursor",

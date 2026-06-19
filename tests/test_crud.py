@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import pytest
 
-from pydynantic import F, attr_not_exists
-from pydynantic.errors import ConditionCheckFailedError, ItemNotFoundError
+from pydynantic import Entity, F, attr_not_exists, key
+from pydynantic.errors import ConditionCheckFailedError, ItemNotFoundError, PydynanticError
 
 
 def make_user(models: object, **overrides: object) -> object:
@@ -105,3 +105,39 @@ def test_update_requires_a_clause(models: object) -> None:
 
     with pytest.raises(PydynanticError):
         models.User.update(org_id="acme", user_id="u1")  # type: ignore[attr-defined]
+
+
+def test_update_changing_status_recomputes_gsi(models: object) -> None:
+    """A GSI whose source fields are all derivable is recomputed silently."""
+    User = models.User  # type: ignore[attr-defined]
+    User.put(make_user(models, status=models.Status.ACTIVE))  # type: ignore[attr-defined]
+    User.update(org_id="acme", user_id="u1", set={"status": models.Status.INACTIVE})  # type: ignore[attr-defined]
+    # by_status keys on org_id + status + user_id, all known on update.
+    found = User.query.by_status(org_id="acme", status="inactive").all()
+    assert {u.user_id for u in found} == {"u1"}
+
+
+def test_update_raises_when_gsi_cannot_be_recomputed(models: object) -> None:
+    table = models.table  # type: ignore[attr-defined]
+
+    class Doc(Entity, table=table, name="doc_guard"):
+        org_id: str
+        doc_id: str
+        status: str = "open"
+        category: str = "x"
+
+        class Meta:
+            primary = key(pk="ORG#{org_id}", sk="DOC#{doc_id}")
+            by_cat = key(index="GSI1", pk="CAT#{category}", sk="ST#{status}#{doc_id}")
+
+    Doc.put(Doc(org_id="acme", doc_id="d1", status="open", category="legal"))
+
+    # Updating only ``status`` cannot rebuild the GSI key (needs ``category``),
+    # so the update must refuse rather than silently leave the index stale.
+    with pytest.raises(PydynanticError, match="by_cat"):
+        Doc.update(org_id="acme", doc_id="d1", set={"status": "closed"})
+
+    # Supplying every source field lets the index be recomputed.
+    Doc.update(org_id="acme", doc_id="d1", set={"status": "closed", "category": "legal"})
+    got = Doc.query.by_cat(category="legal").begins_with("ST#closed").all()
+    assert len(got) == 1
