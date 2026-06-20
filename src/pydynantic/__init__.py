@@ -24,7 +24,7 @@ from .query import QueryBuilder, QueryNamespace, ScanBuilder
 from .table import Index, Table
 from .transactions import Transaction, transaction
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 __all__ = [
     # Core
