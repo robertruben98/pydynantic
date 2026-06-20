@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "pydynantic"
-version = "0.1.0"
+version = "0.2.0"
 description = "Single-table design for DynamoDB in Python, with typed entities on top of Pydantic v2."
 readme = "README.md"
 license = { file = "LICENSE" }
