@@ -13,6 +13,7 @@ import pytest
 from moto import mock_aws
 
 from pydynantic import Collection, Entity, Field, Table, key, version_attr
+from pydynantic.attributes import ttl_attr
 
 TABLE_NAME = "app-test"
 
@@ -107,6 +108,14 @@ def _build_models(table: Table) -> SimpleNamespace:
         class Meta:
             primary = key(pk="CUSTOMER#{customer_id}", sk="ORDER#{order_id}")
 
+    class Session(Entity, table=table, name="session"):
+        session_id: str
+        user_id: str
+        expires_at: datetime | None = ttl_attr()
+
+        class Meta:
+            primary = key(pk="USER#{user_id}", sk="SESSION#{session_id}")
+
     class OrgData(Collection):
         members = [User, Membership, Invoice]
 
@@ -116,6 +125,7 @@ def _build_models(table: Table) -> SimpleNamespace:
         Membership=Membership,
         Invoice=Invoice,
         Order=Order,
+        Session=Session,
         OrgData=OrgData,
         Status=Status,
     )
