@@ -72,3 +72,5 @@ nav:
       - From ElectroDB: migrating/from-electrodb.md
       - From DynamoDB-Toolbox: migrating/from-dynamodb-toolbox.md
   - API reference: reference/api.md
+  - Project:
+      - Policies: policies.md
