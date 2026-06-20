@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- `QueryBuilder.consistent(value=True)` — request a strongly consistent read
+  (`ConsistentRead`); mirrors `get(consistent=...)` and rejects use on a GSI.
+
 ## [0.2.0] - 2026-06-20
 
 ### Added

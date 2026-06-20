@@ -28,7 +28,7 @@ promise safe to keep.
 
 Fill the obvious holes a user hits in week one.
 
-- [ ] **`ConsistentRead` on queries** — expose it on `QueryBuilder` (mirrors
+- [x] **`ConsistentRead` on queries** — expose it on `QueryBuilder` (mirrors
       `get(consistent=...)`); GSIs reject it, so validate and raise early.
 - [ ] **Projection on `batch_get` and collections** — `ProjectionExpression`
       already exists on `get`/`query`/`scan`; extend it to the remaining reads.
