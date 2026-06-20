@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pydantic import Field
 
-from .attributes import version_attr
+from .attributes import ttl_attr, version_attr
 from .collections import Collection, CollectionPage, CollectionResult
 from .entity import Entity
 from .errors import (
@@ -34,6 +34,7 @@ __all__ = [
     "key",
     "KeyDefinition",
     "version_attr",
+    "ttl_attr",
     "Field",
     # Expressions
     "F",

@@ -34,12 +34,12 @@ Fill the obvious holes a user hits in week one.
       already exists on `get`/`query`/`scan`; extend it to the remaining reads.
 - [x] **`ReturnValues` on `put`/`delete`** — return the previous item where the
       caller asks (e.g. `delete(..., return_values="ALL_OLD")`).
-- [ ] **TTL attribute support** — a `ttl_attr()` marker (like `version_attr()`)
+- [x] **TTL attribute support** — a `ttl_attr()` marker (like `version_attr()`)
       that serializes a `datetime`/`int` to the epoch-seconds attribute DynamoDB
       expects, so TTL-configured tables work without manual conversion.
 - [ ] **Auto-timestamps** — opt-in `created_at` / `updated_at` helpers that the
       ORM stamps on `put`/`update`.
-- [ ] **Collection pagination** — `CollectionQuery` currently drains every page;
+- [x] **Collection pagination** — `CollectionQuery` currently drains every page;
       add `.limit()` / `.page(cursor=...)` parity with `QueryBuilder`.
 
 ## 0.4.0 — Correctness & edge cases

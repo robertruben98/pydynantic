@@ -16,6 +16,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `return_values=` on `Entity.put` and `Entity.delete` (`NONE` | `ALL_OLD`) —
   `delete(..., return_values="ALL_OLD")` returns the deleted item (or `None`);
   `put` still always returns the written item.
+- Collection pagination — fluent `CollectionQuery.limit()` / `.page(cursor=...)`
+  returning a `CollectionPage` (bucketed result + opaque cursor + `has_more`);
+  `.all()` still drains every page.
+- `ttl_attr()` — mark a `datetime`/`int` field as a DynamoDB TTL attribute;
+  it is stored as a Unix-epoch-seconds Number and round-trips back to the
+  declared type (no manual conversion).
+
+### Changed
+- Release workflow now also creates a GitHub Release (notes sliced from this
+  changelog) on tag pushes, in addition to publishing to PyPI.
+- Added a `pre-commit` config (ruff lint + format, hygiene hooks) and Dependabot
+  (weekly `github-actions` + `pip` updates).
 
 ## [0.2.0] - 2026-06-20
 
