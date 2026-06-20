@@ -2,11 +2,18 @@
 
 from __future__ import annotations
 
+from datetime import date, datetime, timezone
+from enum import Enum
+
 import pytest
 
-from pydynantic import KeyDefinition, key
+from pydynantic import KeyDefinition, Table, key
 from pydynantic.errors import KeyTemplateError
 from pydynantic.keys import parse, render, template_fields
+
+
+class _Color(str, Enum):
+    RED = "red"
 
 
 def test_template_fields_order() -> None:
@@ -66,3 +73,36 @@ def test_build_key_attributes_for_index(models: object) -> None:
     user_key = models.User.__keys__["by_email"]  # type: ignore[attr-defined]
     attrs = {"email": "a@x.com", "user_id": "u1"}
     assert user_key.key_attributes(attrs) == {"GSI1PK": "EMAIL#a@x.com", "GSI1SK": "USER#u1"}
+
+
+def test_render_bool_lowercased() -> None:
+    assert render("FLAG#{active}", {"active": True}) == "FLAG#true"
+    assert render("FLAG#{active}", {"active": False}) == "FLAG#false"
+
+
+def test_render_date_and_datetime_isoformat() -> None:
+    d = date(2024, 1, 2)
+    dt = datetime(2024, 1, 2, 3, 4, 5, tzinfo=timezone.utc)
+    assert render("D#{d}", {"d": d}) == "D#2024-01-02"
+    assert render("T#{t}", {"t": dt}) == f"T#{dt.isoformat()}"
+
+
+def test_render_enum_uses_value() -> None:
+    assert render("C#{c}", {"c": _Color.RED}) == "C#red"
+
+
+def test_key_with_sk_on_keyless_index_raises() -> None:
+    """A key declaring an sk bound to an index with no sort key is rejected."""
+    table = Table("t", indexes={"GSI_NOSK": {"pk": "GSI_NOSK_PK"}}, client=object())
+    definition = key(index="GSI_NOSK", pk="P#{a}", sk="S#{b}")
+    with pytest.raises(KeyTemplateError, match="no sort key"):
+        definition.bind("bad", table)
+
+
+def test_sk_less_key_build_sk_and_attributes() -> None:
+    """A key without a sort key: build_sk is None and the sk attr is omitted."""
+    table = Table("t", indexes={"GSI_NOSK": {"pk": "GSI_NOSK_PK"}}, client=object())
+    definition = key(index="GSI_NOSK", pk="P#{a}")
+    definition.bind("nosk", table)
+    assert definition.build_sk({"a": "1"}) is None
+    assert definition.key_attributes({"a": "1"}) == {"GSI_NOSK_PK": "P#1"}

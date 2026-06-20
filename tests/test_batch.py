@@ -4,7 +4,11 @@ from __future__ import annotations
 
 from typing import Any
 
+import pytest
+from botocore.exceptions import ClientError
+
 from pydynantic import batch as batch_module
+from pydynantic.errors import PydynanticError
 
 
 def seed(models: object, n: int) -> None:
@@ -140,3 +144,67 @@ def test_batch_write_retries_unprocessed_items(models: object, monkeypatch: Any)
     User.batch_write(puts=[User(user_id="u1", org_id="acme", email="a@x.com", name="A")])
     assert calls["n"] == 2
     assert User.get(org_id="acme", user_id="u1") is not None
+
+
+def test_backoff_is_capped(monkeypatch: Any) -> None:
+    """``_backoff`` caps the exponential sleep at 1.0 second."""
+    slept: list[float] = []
+    monkeypatch.setattr(batch_module.time, "sleep", lambda secs: slept.append(secs))
+    batch_module._backoff(1)  # 2**0 * 0.05 = 0.05
+    batch_module._backoff(8)  # would be 6.4 -> capped to 1.0
+    assert slept[0] == pytest.approx(0.05)
+    assert slept[1] == 1.0
+
+
+def _client_error(code: str) -> ClientError:
+    return ClientError({"Error": {"Code": code, "Message": "boom"}}, "BatchOp")
+
+
+def test_batch_get_client_error_maps_to_pydynantic(models: object, monkeypatch: Any) -> None:
+    User = models.User  # type: ignore[attr-defined]
+    client = models.table.client  # type: ignore[attr-defined]
+
+    def boom(**kwargs: Any) -> Any:
+        raise _client_error("ResourceNotFoundException")
+
+    monkeypatch.setattr(client, "batch_get_item", boom)
+    with pytest.raises(PydynanticError):
+        User.batch_get([("acme", "u1")])
+
+
+def test_batch_get_retry_exhausted_raises_runtime(models: object, monkeypatch: Any) -> None:
+    User = models.User  # type: ignore[attr-defined]
+    client = models.table.client  # type: ignore[attr-defined]
+
+    def always_unprocessed(**kwargs: Any) -> Any:
+        return {"Responses": {}, "UnprocessedKeys": kwargs["RequestItems"]}
+
+    monkeypatch.setattr(client, "batch_get_item", always_unprocessed)
+    monkeypatch.setattr(batch_module, "_backoff", lambda attempt: None)
+    with pytest.raises(RuntimeError, match="batch_get gave up"):
+        User.batch_get([("acme", "u1")])
+
+
+def test_batch_write_client_error_maps_to_pydynantic(models: object, monkeypatch: Any) -> None:
+    User = models.User  # type: ignore[attr-defined]
+    client = models.table.client  # type: ignore[attr-defined]
+
+    def boom(**kwargs: Any) -> Any:
+        raise _client_error("ResourceNotFoundException")
+
+    monkeypatch.setattr(client, "batch_write_item", boom)
+    with pytest.raises(PydynanticError):
+        User.batch_write(puts=[User(user_id="u1", org_id="acme", email="a@x.com", name="A")])
+
+
+def test_batch_write_retry_exhausted_raises_runtime(models: object, monkeypatch: Any) -> None:
+    User = models.User  # type: ignore[attr-defined]
+    client = models.table.client  # type: ignore[attr-defined]
+
+    def always_unprocessed(**kwargs: Any) -> Any:
+        return {"UnprocessedItems": kwargs["RequestItems"]}
+
+    monkeypatch.setattr(client, "batch_write_item", always_unprocessed)
+    monkeypatch.setattr(batch_module, "_backoff", lambda attempt: None)
+    with pytest.raises(RuntimeError, match="batch_write gave up"):
+        User.batch_write(puts=[User(user_id="u1", org_id="acme", email="a@x.com", name="A")])

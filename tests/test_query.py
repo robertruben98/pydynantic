@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 import pytest
 
 from pydynantic import F
@@ -228,3 +230,102 @@ def test_consistent_on_gsi_raises(models: object) -> None:
 def test_consistent_false_on_gsi_allowed(models: object) -> None:
     builder = models.User.query.by_email(email="x@y.com").consistent(False)  # type: ignore[attr-defined]
     assert "ConsistentRead" not in builder._build_params()
+
+
+# --- Pagination: stub query/scan to return two pages (first w/ LastEvaluatedKey) ---
+
+
+def _raw_user(models: object, i: int) -> dict[str, Any]:
+    User = models.User  # type: ignore[attr-defined]
+    return User(user_id=f"u{i}", org_id="acme", email=f"u{i}@x.com", name=f"N{i}").to_dynamo()
+
+
+def _two_pages_query(models: object, monkeypatch: Any, page1: list[Any], page2: list[Any]) -> dict:
+    client = models.table.client  # type: ignore[attr-defined]
+    calls = {"n": 0}
+
+    def fake_query(**kwargs: Any) -> Any:
+        calls["n"] += 1
+        if calls["n"] == 1:
+            return {"Items": page1, "LastEvaluatedKey": {"PK": {"S": "x"}}, "Count": len(page1)}
+        return {"Items": page2, "Count": len(page2)}
+
+    monkeypatch.setattr(client, "query", fake_query)
+    return calls
+
+
+def _two_pages_scan(models: object, monkeypatch: Any, page1: list[Any], page2: list[Any]) -> dict:
+    client = models.table.client  # type: ignore[attr-defined]
+    calls = {"n": 0}
+
+    def fake_scan(**kwargs: Any) -> Any:
+        calls["n"] += 1
+        if calls["n"] == 1:
+            return {"Items": page1, "LastEvaluatedKey": {"PK": {"S": "x"}}, "Count": len(page1)}
+        return {"Items": page2, "Count": len(page2)}
+
+    monkeypatch.setattr(client, "scan", fake_scan)
+    return calls
+
+
+def test_query_iter_paginates(models: object, monkeypatch: Any) -> None:
+    calls = _two_pages_query(models, monkeypatch, [_raw_user(models, 1)], [_raw_user(models, 2)])
+    users = list(models.User.query.primary(org_id="acme").iter())  # type: ignore[attr-defined]
+    assert {u.user_id for u in users} == {"u1", "u2"}
+    assert calls["n"] == 2
+
+
+def test_query_iter_limit_decrements_across_pages(models: object, monkeypatch: Any) -> None:
+    # Limit of 2 spans both pages (1 item each), exhausting on the second page.
+    _two_pages_query(models, monkeypatch, [_raw_user(models, 1)], [_raw_user(models, 2)])
+    users = models.User.query.primary(org_id="acme").limit(2).all()  # type: ignore[attr-defined]
+    assert len(users) == 2
+
+
+def test_fetch_two_paginates(models: object, monkeypatch: Any) -> None:
+    # One item per page; one_or_none probes a second item across the page break.
+    _two_pages_query(models, monkeypatch, [_raw_user(models, 1)], [_raw_user(models, 2)])
+    with pytest.raises(MultipleResultsError):
+        models.User.query.primary(org_id="acme").one_or_none()  # type: ignore[attr-defined]
+
+
+def test_query_count_paginates(models: object, monkeypatch: Any) -> None:
+    calls = _two_pages_query(models, monkeypatch, [_raw_user(models, 1)], [_raw_user(models, 2)])
+    assert models.User.query.primary(org_id="acme").count() == 2  # type: ignore[attr-defined]
+    assert calls["n"] == 2
+
+
+def test_query_page_with_cursor(models: object, monkeypatch: Any) -> None:
+    from pydynantic.pagination import encode_cursor
+
+    client = models.table.client  # type: ignore[attr-defined]
+    seen: dict[str, Any] = {}
+
+    def fake_query(**kwargs: Any) -> Any:
+        seen.update(kwargs)
+        return {"Items": [_raw_user(models, 9)]}
+
+    monkeypatch.setattr(client, "query", fake_query)
+    cursor = encode_cursor({"PK": {"S": "ORG#acme"}, "SK": {"S": "USER#u5"}})
+    page = models.User.query.primary(org_id="acme").page(cursor=cursor)  # type: ignore[attr-defined]
+    assert [u.user_id for u in page.items] == ["u9"]
+    assert seen["ExclusiveStartKey"] == {"PK": {"S": "ORG#acme"}, "SK": {"S": "USER#u5"}}
+
+
+def test_scan_iter_paginates(models: object, monkeypatch: Any) -> None:
+    calls = _two_pages_scan(models, monkeypatch, [_raw_user(models, 1)], [_raw_user(models, 2)])
+    users = list(models.User.scan().iter())  # type: ignore[attr-defined]
+    assert {u.user_id for u in users} == {"u1", "u2"}
+    assert calls["n"] == 2
+
+
+def test_scan_first_paginates(models: object, monkeypatch: Any) -> None:
+    _two_pages_scan(models, monkeypatch, [], [_raw_user(models, 2)])
+    first = models.User.scan().first()  # type: ignore[attr-defined]
+    assert first is not None and first.user_id == "u2"
+
+
+def test_scan_count_paginates(models: object, monkeypatch: Any) -> None:
+    calls = _two_pages_scan(models, monkeypatch, [_raw_user(models, 1)], [_raw_user(models, 2)])
+    assert models.User.scan().count() == 2  # type: ignore[attr-defined]
+    assert calls["n"] == 2

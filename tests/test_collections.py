@@ -3,6 +3,11 @@
 from __future__ import annotations
 
 from decimal import Decimal
+from typing import Any
+
+import pytest
+
+from pydynantic import Collection
 
 
 def test_collection_buckets_by_entity(models: object) -> None:
@@ -173,3 +178,38 @@ def test_collection_all_still_drains(models: object) -> None:
     # A limit set on the builder must not affect all(): it still drains.
     result = OrgData.query(org_id="acme").limit(1).all()
     assert len(result.all()) == 2
+
+
+def test_collection_with_no_members_raises(models: object) -> None:
+    class Empty(Collection):
+        members: list[Any] = []
+
+    with pytest.raises(ValueError, match="no members"):
+        Empty.query(org_id="acme")
+
+
+def test_collection_all_paginates_and_skips_unknown_entity(
+    models: object, monkeypatch: Any
+) -> None:
+    """all() drains two pages and skips items whose __entity__ is unknown."""
+    User = models.User  # type: ignore[attr-defined]
+    OrgData = models.OrgData  # type: ignore[attr-defined]
+    client = models.table.client  # type: ignore[attr-defined]
+
+    known = User(user_id="u1", org_id="acme", email="a@x.com", name="Ana").to_dynamo()
+    unknown = dict(known)
+    unknown["__entity__"] = {"S": "widget"}  # not a registered member
+    second = User(user_id="u2", org_id="acme", email="b@x.com", name="Bob").to_dynamo()
+
+    calls = {"n": 0}
+
+    def fake_query(**kwargs: Any) -> Any:
+        calls["n"] += 1
+        if calls["n"] == 1:
+            return {"Items": [known, unknown], "LastEvaluatedKey": {"PK": {"S": "x"}}}
+        return {"Items": [second]}
+
+    monkeypatch.setattr(client, "query", fake_query)
+    result = OrgData.query(org_id="acme").all()
+    assert calls["n"] == 2
+    assert {u.user_id for u in result.users} == {"u1", "u2"}
