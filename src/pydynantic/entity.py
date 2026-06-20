@@ -8,6 +8,7 @@ typed CRUD / query surface.
 
 from __future__ import annotations
 
+from datetime import datetime
 from typing import TYPE_CHECKING, Any, ClassVar, TypeVar, cast
 
 from botocore.exceptions import ClientError
@@ -16,7 +17,7 @@ from pydantic import ValidationError as PydanticValidationError
 from pydantic._internal._model_construction import ModelMetaclass
 from typing_extensions import Self
 
-from .attributes import is_version_field
+from .attributes import is_ttl_field, is_version_field
 from .errors import (
     ConditionCheckFailedError,
     KeyTemplateError,
@@ -133,6 +134,13 @@ class EntityMeta(ModelMetaclass):
                 cls.__version_field__ = field_name
                 break
 
+        cls.__ttl_field__ = None
+        for field_name, field_info in cls.model_fields.items():
+            if is_ttl_field(field_info):
+                if cls.__ttl_field__ is not None:
+                    raise TypeError(f"{cls_name}: more than one TTL field declared")
+                cls.__ttl_field__ = field_name
+
         table.register(cls)
         return cls
 
@@ -153,6 +161,7 @@ class Entity(BaseModel, metaclass=EntityMeta):
     __primary_key__: ClassVar[KeyDefinition]
     __key_attrs__: ClassVar[list[str]]
     __version_field__: ClassVar[str | None]
+    __ttl_field__: ClassVar[str | None]
 
     query: ClassVar[_QueryAccessor] = _QueryAccessor()
 
@@ -162,6 +171,15 @@ class Entity(BaseModel, metaclass=EntityMeta):
         cls = type(self)
         attrs = {field_name: getattr(self, field_name) for field_name in cls.model_fields}
         item = serialize_item(attrs)
+        ttl_field = cls.__ttl_field__
+        if ttl_field is not None:
+            ttl_value = attrs[ttl_field]
+            if ttl_value is not None:
+                if isinstance(ttl_value, datetime):
+                    epoch = int(ttl_value.timestamp())
+                else:
+                    epoch = int(ttl_value)
+                item[ttl_field] = serialize(epoch)
         for key_def in cls.__keys__.values():
             for physical_name, value in key_def.key_attributes(attrs).items():
                 item[physical_name] = serialize(value)
