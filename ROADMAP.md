@@ -98,15 +98,15 @@ What turns a working library into one people adopt.
 
 The release itself is mostly process, not code.
 
-- [ ] **API freeze & review** — audit every public symbol in `__all__`; mark
+- [x] **API freeze & review** — audit every public symbol in `__all__`; mark
       anything still uncertain as provisional or drop it before the freeze.
-- [ ] **Deprecation policy** — document the support window and how breaking
+- [x] **Deprecation policy** — document the support window and how breaking
       changes will be staged (`DeprecationWarning` → removal in next major).
-- [ ] **`Development Status :: 5 - Production/Stable`** classifier in
+- [x] **`Development Status :: 5 - Production/Stable`** classifier in
       `pyproject.toml` (currently `3 - Alpha`).
-- [ ] **Tag-naming consistency** — standardize on `vX.Y.Z` or bare `X.Y.Z` for
+- [x] **Tag-naming consistency** — standardize on `vX.Y.Z` or bare `X.Y.Z` for
       release tags (0.1.0 used `v0.1.0`, 0.2.0 used `0.2.0`).
-- [ ] **CHANGELOG + upgrade notes** for 1.0; announce.
+- [x] **CHANGELOG + upgrade notes** for 1.0; announce.
 
 ---
 

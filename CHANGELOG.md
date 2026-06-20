@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-06-20
+
+First stable release. The public API (everything in `pydynantic.__all__`) is now
+covered by the semantic-versioning and deprecation commitments documented in the
+project policies. Single-table modelling, keys, CRUD, queries/scan, filters,
+pagination, batch, transactions, collections, optimistic locking, TTL,
+auto-timestamps, and observability hooks are all stable.
+
 ### Added
 - `QueryBuilder.consistent(value=True)` — request a strongly consistent read
   (`ConsistentRead`); mirrors `get(consistent=...)` and rejects use on a GSI.
@@ -119,6 +127,7 @@ First public release.
 - Dedicated exception hierarchy rooted at `PydynanticError`.
 - `py.typed` marker; `mypy --strict` clean; CI matrix for Python 3.10–3.13.
 
-[Unreleased]: https://github.com/robertruben98/pydynantic/compare/0.2.0...HEAD
+[Unreleased]: https://github.com/robertruben98/pydynantic/compare/1.0.0...HEAD
+[1.0.0]: https://github.com/robertruben98/pydynantic/compare/0.2.0...1.0.0
 [0.2.0]: https://github.com/robertruben98/pydynantic/compare/0.1.0...0.2.0
 [0.1.0]: https://github.com/robertruben98/pydynantic/releases/tag/0.1.0
