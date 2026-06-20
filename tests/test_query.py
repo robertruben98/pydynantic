@@ -126,6 +126,38 @@ def test_one_success_and_failure(models: object) -> None:
         models.User.query.primary(org_id="ghost").one()  # type: ignore[attr-defined]
 
 
+def test_one_or_none_ignores_limit_one_and_raises(models: object) -> None:
+    seed(models, 2)
+    with pytest.raises(MultipleResultsError):
+        models.User.query.primary(org_id="acme").limit(1).one_or_none()  # type: ignore[attr-defined]
+
+
+def test_one_ignores_limit_one_and_raises(models: object) -> None:
+    seed(models, 2)
+    with pytest.raises(MultipleResultsError):
+        models.User.query.primary(org_id="acme").limit(1).one()  # type: ignore[attr-defined]
+
+
+def test_one_or_none_limit_one_single_row_returns(models: object) -> None:
+    seed(models, 1)
+    user = models.User.query.primary(org_id="acme").limit(1).one_or_none()  # type: ignore[attr-defined]
+    assert user is not None and user.user_id == "u1"
+
+
+def test_one_or_none_limit_one_zero_rows_returns_none(models: object) -> None:
+    assert models.User.query.primary(org_id="ghost").limit(1).one_or_none() is None  # type: ignore[attr-defined]
+
+
+def test_one_or_none_does_not_mutate_limit(models: object) -> None:
+    seed(models, 5)
+    builder = models.User.query.primary(org_id="acme").limit(2)  # type: ignore[attr-defined]
+    with pytest.raises(MultipleResultsError):
+        builder.one_or_none()
+    # The builder remains reusable: original .limit(2) is untouched.
+    assert builder._limit == 2
+    assert len(builder.all()) == 2
+
+
 def test_unknown_access_pattern_raises(models: object) -> None:
     with pytest.raises(AttributeError):
         models.User.query.nonexistent(org_id="acme")  # type: ignore[attr-defined]
