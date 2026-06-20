@@ -27,9 +27,11 @@ from __future__ import annotations
 from decimal import Decimal
 from typing import Any
 
+import pytest
 from hypothesis import given, settings
 from hypothesis import strategies as st
 
+from pydynantic.errors import PydynanticError
 from pydynantic.marshalling import _check_number, deserialize, serialize
 
 # DynamoDB numbers: <=38 significant digits, exponent roughly Emin=-130..Emax=125.
@@ -85,14 +87,29 @@ decimals = st.decimals(
     places=None,
 ).filter(_in_dynamo_number_space)
 
-# floats: finite, in-range, no NaN/inf. Subnormals/very small magnitudes have an
-# exponent below DynamoDB's Emin, so filter them out (zero is fine).
-floats = st.floats(
-    min_value=-1e30,
-    max_value=1e30,
-    allow_nan=False,
-    allow_infinity=False,
-    allow_subnormal=False,
+# floats: finite, in-range, no NaN/inf. Magnitudes below ~1e-128 have an exponent
+# below DynamoDB's Emin and underflow (boto3 would raise ``decimal.Underflow``;
+# pydynantic now raises ``PydynanticError`` -- see ``test_underflow_*`` below), so
+# the round-trip property is restricted to zero plus magnitudes in
+# ``[1e-128, 1e30]``. The ``_in_dynamo_number_space`` filter is a final safety net.
+_MIN_FLOAT_MAGNITUDE = 1e-128
+_MAX_FLOAT_MAGNITUDE = 1e30
+floats = st.one_of(
+    st.just(0.0),
+    st.floats(
+        min_value=_MIN_FLOAT_MAGNITUDE,
+        max_value=_MAX_FLOAT_MAGNITUDE,
+        allow_nan=False,
+        allow_infinity=False,
+        allow_subnormal=False,
+    ),
+    st.floats(
+        min_value=-_MAX_FLOAT_MAGNITUDE,
+        max_value=-_MIN_FLOAT_MAGNITUDE,
+        allow_nan=False,
+        allow_infinity=False,
+        allow_subnormal=False,
+    ),
 ).filter(_in_dynamo_number_space)
 
 
@@ -188,3 +205,20 @@ def test_int_set_roundtrip(value: set[int]) -> None:
     assert isinstance(result, set)
     # ints come back as Decimal; compare as a set of Decimals (order irrelevant).
     assert result == {Decimal(item) for item in value}
+
+
+# --- out-of-range guard rails (example-based) ---------------------------------
+# These pin the boundary the float strategy above relies on: magnitudes below
+# DynamoDB's Emin must surface as a friendly PydynanticError, not a raw
+# decimal.Underflow leaking from boto3. (Regression for the underflow gap in
+# ``_check_number``.)
+
+
+def test_underflow_float_raises_pydynantic_error() -> None:
+    with pytest.raises(PydynanticError):
+        serialize(1e-200)
+
+
+def test_underflow_decimal_raises_pydynantic_error() -> None:
+    with pytest.raises(PydynanticError):
+        serialize(Decimal("1e-200"))
