@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "pydynantic"
-version = "0.2.0"
+version = "1.0.0"
 description = "Single-table design for DynamoDB in Python, with typed entities on top of Pydantic v2."
 readme = "README.md"
 license = { file = "LICENSE" }
@@ -12,7 +12,7 @@ requires-python = ">=3.10"
 authors = [{ name = "Robert Ruben" }]
 keywords = ["dynamodb", "single-table", "pydantic", "aws", "boto3", "orm"]
 classifiers = [
-    "Development Status :: 3 - Alpha",
+    "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3.10",
