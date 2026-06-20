@@ -13,7 +13,7 @@ jobs:
       matrix:
         python-version: ["3.10", "3.11", "3.12", "3.13"]
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v6
@@ -35,7 +35,7 @@ jobs:
         run: pytest --cov=pydynantic --cov-report=term-missing --cov-report=xml --cov-fail-under=90
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
+        uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           fail_ci_if_error: false
@@ -52,7 +52,7 @@ jobs:
         ports:
           - 8000:8000
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v6
