@@ -51,11 +51,23 @@ def _check_number(d: Decimal) -> Decimal:
         with localcontext(_NUMBER_CONTEXT) as ctx:
             ctx.traps[decimal.InvalidOperation] = True
             ctx.traps[decimal.Overflow] = True
+            # Tiny magnitudes (exponent below DynamoDB's Emin) underflow; trap
+            # them here so they surface as a friendly PydynanticError instead of
+            # a raw ``decimal.Underflow`` from boto3's own DynamoDB context.
+            ctx.traps[decimal.Underflow] = True
+            ctx.traps[decimal.Subnormal] = True
             ctx.traps[decimal.Inexact] = True
             ctx.traps[decimal.Rounded] = True
             # ``+d`` applies the context, raising if precision/range is exceeded.
             _ = +d
-    except (decimal.InvalidOperation, decimal.Overflow, decimal.Inexact, decimal.Rounded) as exc:
+    except (
+        decimal.InvalidOperation,
+        decimal.Overflow,
+        decimal.Underflow,
+        decimal.Subnormal,
+        decimal.Inexact,
+        decimal.Rounded,
+    ) as exc:
         raise PydynanticError(f"number exceeds DynamoDB precision/range: {d!r}") from exc
     return d
 
