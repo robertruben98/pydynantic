@@ -83,15 +83,15 @@ Make "it works" provable and keep it that way.
 
 What turns a working library into one people adopt.
 
-- [ ] **Docs site** — MkDocs (Material) with: single-table-design primer, full
+- [x] **Docs site** — MkDocs (Material) with: single-table-design primer, full
       API reference (mkdocstrings), and a recipe/cookbook section.
-- [ ] **Migration guides** — "coming from ElectroDB / DynamoDB-Toolbox" mapping
+- [x] **Migration guides** — "coming from ElectroDB / DynamoDB-Toolbox" mapping
       tables; the README already pitches against them, so close the loop.
-- [ ] **Worked examples** — a runnable example app (e.g. multi-tenant SaaS data
+- [x] **Worked examples** — a runnable example app (e.g. multi-tenant SaaS data
       model) in `examples/`.
-- [ ] **Error-message audit** — every raised `PydynanticError` should tell the
+- [x] **Error-message audit** — every raised `PydynanticError` should tell the
       user what to do next (the new stale-GSI error is the template).
-- [ ] **Observability hooks** — optional callback/logging around each DynamoDB
+- [x] **Observability hooks** — optional callback/logging around each DynamoDB
       call for tracing and cost attribution, without forcing a logging dep.
 
 ## 1.0.0 — Stabilize

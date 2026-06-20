@@ -25,8 +25,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `created_at_attr()` / `updated_at_attr()` — opt-in auto-timestamps; `put`
   stamps `created_at` once and `updated_at` every write, `update` refreshes
   `updated_at` (unless set explicitly), with in-memory rollback on a failed put.
+- Observability hooks — `Table(..., on_operation=...)` receives an
+  `OperationEvent` (operation, table, duration, success/exception, consumed
+  capacity) around every DynamoDB call; opt-in and zero-overhead by default,
+  with no logging dependency. Exposes `OperationEvent` / `OperationHook`.
+- Documentation site (MkDocs Material): single-table-design primer, full guide,
+  auto-generated API reference, a recipe cookbook, and migration guides from
+  ElectroDB and DynamoDB-Toolbox. A runnable multi-tenant example in `examples/`.
 
 ### Changed
+- Error messages across the library are now actionable — they name the offending
+  value/attribute and, where applicable, the remedy (the stale-GSI guard is the
+  template).
 - Release workflow now also creates a GitHub Release (notes sliced from this
   changelog) on tag pushes, in addition to publishing to PyPI.
 - Added a `pre-commit` config (ruff lint + format, hygiene hooks) and Dependabot
