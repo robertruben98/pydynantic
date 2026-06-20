@@ -8,7 +8,7 @@ typed CRUD / query surface.
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import TYPE_CHECKING, Any, ClassVar, TypeVar, cast
 
 from botocore.exceptions import ClientError
@@ -17,7 +17,12 @@ from pydantic import ValidationError as PydanticValidationError
 from pydantic._internal._model_construction import ModelMetaclass
 from typing_extensions import Self
 
-from .attributes import is_ttl_field, is_version_field
+from .attributes import (
+    is_created_at_field,
+    is_ttl_field,
+    is_updated_at_field,
+    is_version_field,
+)
 from .errors import (
     ConditionCheckFailedError,
     KeyTemplateError,
@@ -141,6 +146,20 @@ class EntityMeta(ModelMetaclass):
                     raise TypeError(f"{cls_name}: more than one TTL field declared")
                 cls.__ttl_field__ = field_name
 
+        cls.__created_field__ = None
+        for field_name, field_info in cls.model_fields.items():
+            if is_created_at_field(field_info):
+                if cls.__created_field__ is not None:
+                    raise TypeError(f"{cls_name}: more than one created_at field declared")
+                cls.__created_field__ = field_name
+
+        cls.__updated_field__ = None
+        for field_name, field_info in cls.model_fields.items():
+            if is_updated_at_field(field_info):
+                if cls.__updated_field__ is not None:
+                    raise TypeError(f"{cls_name}: more than one updated_at field declared")
+                cls.__updated_field__ = field_name
+
         table.register(cls)
         return cls
 
@@ -162,6 +181,8 @@ class Entity(BaseModel, metaclass=EntityMeta):
     __key_attrs__: ClassVar[list[str]]
     __version_field__: ClassVar[str | None]
     __ttl_field__: ClassVar[str | None]
+    __created_field__: ClassVar[str | None]
+    __updated_field__: ClassVar[str | None]
 
     query: ClassVar[_QueryAccessor] = _QueryAccessor()
 
@@ -254,6 +275,20 @@ class Entity(BaseModel, metaclass=EntityMeta):
             lock = attr_not_exists(cls.__primary_key__.pk_attr) | (F(version_field) == current)
             condition = lock if condition is None else (condition & lock)
 
+        # Auto-timestamps: stamp created_at on first write, updated_at on every
+        # write. Capture prior values so a failed write can be rolled back.
+        now = datetime.now(timezone.utc)
+        created_field = cls.__created_field__
+        updated_field = cls.__updated_field__
+        prior_created = prior_updated = None
+        if created_field is not None:
+            prior_created = getattr(item, created_field)
+            if prior_created is None:
+                setattr(item, created_field, now)
+        if updated_field is not None:
+            prior_updated = getattr(item, updated_field)
+            setattr(item, updated_field, now)
+
         params: dict[str, Any] = {"TableName": cls._table_name(), "Item": item.to_dynamo()}
         if return_values != "NONE":
             params["ReturnValues"] = return_values
@@ -270,6 +305,11 @@ class Entity(BaseModel, metaclass=EntityMeta):
                 # The write never landed; undo the in-memory bump so the caller's
                 # object still reflects the stored version and can be retried.
                 setattr(item, version_field, current)
+            # Likewise roll back the timestamp stamps so a retry re-stamps cleanly.
+            if created_field is not None:
+                setattr(item, created_field, prior_created)
+            if updated_field is not None:
+                setattr(item, updated_field, prior_updated)
             raise map_client_error(exc, versioned=versioned) from exc
         return item
 
@@ -376,6 +416,12 @@ class Entity(BaseModel, metaclass=EntityMeta):
         """
         context = ExpressionContext()
         set_items: dict[str, Any] = dict(set or {})
+
+        # Auto-stamp updated_at unless the caller set it explicitly. Done before
+        # the GSI recompute so an updated_at-fed index recomputes from the stamp.
+        updated_field = cls.__updated_field__
+        if updated_field is not None and updated_field not in set_items:
+            set_items[updated_field] = datetime.now(timezone.utc)
 
         # Recompute GSI key attributes affected by changed source attributes.
         known = {**key_attrs, **set_items}
