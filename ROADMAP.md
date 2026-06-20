@@ -46,21 +46,21 @@ Fill the obvious holes a user hits in week one.
 
 Harden the data path against the parts of DynamoDB that bite.
 
-- [ ] **Empty-string values** — DynamoDB now allows empty strings; decide and
+- [x] **Empty-string values** — DynamoDB now allows empty strings; decide and
       document whether they round-trip or are stripped (today `None`/empty sets
       are dropped in `serialize_item`).
-- [ ] **Typed set attributes** — verify `SS`/`NS`/`BS` round-trip for every
+- [x] **Typed set attributes** — verify `SS`/`NS`/`BS` round-trip for every
       supported element type and reject mixed-type sets with a clear error.
-- [ ] **Number precision** — pin the `Decimal` context to DynamoDB's 38-digit /
+- [x] **Number precision** — pin the `Decimal` context to DynamoDB's 38-digit /
       ±10^125 limits and raise a friendly error on overflow instead of a boto3
       one.
-- [ ] **Cursor robustness** — document the pagination cursor's opacity contract;
+- [x] **Cursor robustness** — document the pagination cursor's opacity contract;
       decide whether to sign/version it so a tampered or stale cursor fails
       loudly rather than mis-paginating.
-- [ ] **`one_or_none()` with an explicit `.limit(1)`** — today a user-set limit
+- [x] **`one_or_none()` with an explicit `.limit(1)`** — today a user-set limit
       can mask a genuine "multiple results" case; make the contract explicit
       (raise, or document the override).
-- [ ] **Reserved-word / dotted-path fuzzing** — property-test the expression
+- [x] **Reserved-word / dotted-path fuzzing** — property-test the expression
       builder so no attribute name can collide or break `ExpressionAttributeNames`.
 
 ## 0.5.0 — Quality gates

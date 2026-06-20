@@ -31,6 +31,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   changelog) on tag pushes, in addition to publishing to PyPI.
 - Added a `pre-commit` config (ruff lint + format, hygiene hooks) and Dependabot
   (weekly `github-actions` + `pip` updates).
+- Pagination cursors are now versioned and strictly validated: a tampered,
+  stale, or hand-built cursor raises `PydynanticError` instead of mis-paginating
+  or leaking a raw decode error; cursors are padding-free base64url.
+- `one_or_none()` / `one()` now always probe for a second item regardless of any
+  `.limit()` set on the builder, so a user limit can no longer mask a genuine
+  multiple-results case (and the builder's limit is no longer mutated).
+
+### Fixed
+- Marshalling hardening: mixed-type sets are rejected early with a clear
+  `PydynanticError` (instead of a cryptic boto3 error); numbers exceeding
+  DynamoDB's 38-digit / ±10^125 limits raise a friendly error; empty strings are
+  retained and round-trip (only `None` and empty sets are dropped).
+
+### Tests
+- Property-based (Hypothesis) fuzzing of the expression builder: placeholder
+  dedup, token round-trip, dotted paths, reserved words, and namespace
+  disjointness across generated attribute names and conditions.
 
 ## [0.2.0] - 2026-06-20
 
