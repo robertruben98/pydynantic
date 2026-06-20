@@ -68,7 +68,10 @@ def _check_number(d: Decimal) -> Decimal:
         decimal.Inexact,
         decimal.Rounded,
     ) as exc:
-        raise PydynanticError(f"number exceeds DynamoDB precision/range: {d!r}") from exc
+        raise PydynanticError(
+            f"number {d!r} exceeds DynamoDB's precision/range (up to 38 significant "
+            "digits); round or scale the value before storing it."
+        ) from exc
     return d
 
 
@@ -126,7 +129,11 @@ def _prepare(value: Any) -> Any:
         return prepared
     if isinstance(value, (list, tuple)):
         return [_prepare(item) for item in value]
-    raise TypeError(f"Cannot marshal value of type {type(value)!r} to DynamoDB")
+    raise TypeError(
+        f"Cannot marshal value of type {type(value).__name__!r} to DynamoDB; supported "
+        "types are None, bool, int, float, Decimal, str, bytes, datetime, date, UUID, Enum, "
+        "pydantic models, mappings, sets, lists, and tuples."
+    )
 
 
 def serialize(value: Any) -> AttributeValue:

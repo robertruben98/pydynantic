@@ -55,7 +55,9 @@ def map_client_error(exc: ClientError, *, versioned: bool = False) -> Pydynantic
     message = exc.response.get("Error", {}).get("Message", str(exc))
     if code == "ConditionalCheckFailedException":
         if versioned:
-            return OptimisticLockError(message)
+            return OptimisticLockError(
+                f"{message} (the item was modified concurrently; re-read it and retry the write)"
+            )
         return ConditionCheckFailedError(message)
     if code == "TransactionCanceledException":
         reasons = exc.response.get("CancellationReasons", [])
@@ -231,7 +233,10 @@ class Entity(BaseModel, metaclass=EntityMeta):
             return key
         if isinstance(key, (tuple, list)):
             return dict(zip(cls.__key_attrs__, key, strict=False))
-        raise TypeError(f"Cannot interpret {key!r} as a key for {cls.__name__}")
+        raise TypeError(
+            f"Cannot interpret {key!r} as a key for {cls.__name__}; pass a dict of "
+            f"key attributes, or a tuple/list ordered as {list(cls.__key_attrs__)}."
+        )
 
     @classmethod
     def build_key(cls, attrs: dict[str, Any]) -> Item:
@@ -458,7 +463,10 @@ class Entity(BaseModel, metaclass=EntityMeta):
             clauses.append("DELETE " + ", ".join(parts))
 
         if not clauses:
-            raise PydynanticError("update() requires at least one of set/remove/add/delete")
+            raise PydynanticError(
+                "update() requires at least one write action; pass one of "
+                "set=, remove=, add=, or delete=."
+            )
 
         params: dict[str, Any] = {
             "TableName": cls._table_name(),

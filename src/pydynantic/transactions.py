@@ -55,9 +55,7 @@ class Transaction:
         self._attach_condition(action, condition, ExpressionContext())
         self._items.append({"Put": action})
 
-    def delete(
-        self, entity_cls: type[E], *, key: Any, condition: Condition | None = None
-    ) -> None:
+    def delete(self, entity_cls: type[E], *, key: Any, condition: Condition | None = None) -> None:
         """Queue a ``Delete`` action."""
         self._check_capacity()
         action: dict[str, Any] = {
@@ -67,9 +65,7 @@ class Transaction:
         self._attach_condition(action, condition, ExpressionContext())
         self._items.append({"Delete": action})
 
-    def condition_check(
-        self, entity_cls: type[E], *, key: Any, condition: Condition
-    ) -> None:
+    def condition_check(self, entity_cls: type[E], *, key: Any, condition: Condition) -> None:
         """Queue a ``ConditionCheck`` action (no write, just a guard)."""
         self._check_capacity()
         context = ExpressionContext()
@@ -107,7 +103,10 @@ class Transaction:
             parts = [f"{context.name(k)} {context.value(v)}" for k, v in delete.items()]
             clauses.append("DELETE " + ", ".join(parts))
         if not clauses:
-            raise PydynanticError("tx.update() requires at least one write clause")
+            raise PydynanticError(
+                "tx.update() requires at least one write clause; pass one of "
+                "set=, remove=, add=, or delete=."
+            )
 
         action: dict[str, Any] = {
             "TableName": entity_cls._table_name(),
