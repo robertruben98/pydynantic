@@ -53,6 +53,47 @@ def test_delete_with_failing_condition(models: object) -> None:
         User.delete(org_id="acme", user_id="u1", condition=F("name") == "wrong")
 
 
+def test_delete_returns_old_item(models: object) -> None:
+    User = models.User  # type: ignore[attr-defined]
+    User.put(make_user(models))
+    old = User.delete(org_id="acme", user_id="u1", return_values="ALL_OLD")
+    assert old is not None
+    assert old.email == "a@x.com"
+    assert User.get(org_id="acme", user_id="u1") is None
+
+
+def test_delete_missing_returns_none_with_all_old(models: object) -> None:
+    User = models.User  # type: ignore[attr-defined]
+    assert User.delete(org_id="acme", user_id="nope", return_values="ALL_OLD") is None
+
+
+def test_delete_default_returns_none(models: object) -> None:
+    User = models.User  # type: ignore[attr-defined]
+    User.put(make_user(models))
+    assert User.delete(org_id="acme", user_id="u1") is None
+
+
+def test_delete_invalid_return_values_raises(models: object) -> None:
+    User = models.User  # type: ignore[attr-defined]
+    with pytest.raises(PydynanticError):
+        User.delete(org_id="acme", user_id="u1", return_values="ALL_NEW")
+
+
+def test_put_invalid_return_values_raises(models: object) -> None:
+    User = models.User  # type: ignore[attr-defined]
+    with pytest.raises(PydynanticError):
+        User.put(make_user(models), return_values="ALL_NEW")
+
+
+def test_put_all_old_still_returns_written_item(models: object) -> None:
+    User = models.User  # type: ignore[attr-defined]
+    User.put(make_user(models, name="Ana"))
+    modified = make_user(models, name="Ana B.")
+    result = User.put(modified, return_values="ALL_OLD")
+    assert result is modified
+    assert result.name == "Ana B."
+
+
 def test_update_set_and_add(models: object) -> None:
     User = models.User  # type: ignore[attr-defined]
     User.put(make_user(models, login_count=0))
