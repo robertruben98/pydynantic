@@ -13,6 +13,12 @@ VERSION_MARKER = "__pydynantic_version__"
 #: Marker key placed in ``json_schema_extra`` to flag a TTL attribute.
 TTL_MARKER = "__pydynantic_ttl__"
 
+#: Marker key placed in ``json_schema_extra`` to flag a created-at attribute.
+CREATED_AT_MARKER = "__pydynantic_created_at__"
+
+#: Marker key placed in ``json_schema_extra`` to flag an updated-at attribute.
+UPDATED_AT_MARKER = "__pydynantic_updated_at__"
+
 
 def version_attr(default: int = 0, **kwargs: Any) -> Any:
     """Mark an integer field as the optimistic-locking version attribute.
@@ -58,3 +64,39 @@ def is_ttl_field(field: FieldInfo) -> bool:
     """Return ``True`` if a Pydantic field was declared via :func:`ttl_attr`."""
     extra = field.json_schema_extra
     return isinstance(extra, dict) and bool(extra.get(TTL_MARKER))
+
+
+def created_at_attr(**kwargs: Any) -> Any:
+    """Mark a ``datetime | None`` field as the auto-managed creation timestamp.
+
+    On the first ``put`` (when the field is still ``None``) pydynantic stamps the
+    field with ``datetime.now(timezone.utc)``. Subsequent puts leave it untouched,
+    and ``update`` never modifies it.
+    """
+    extra = dict(kwargs.pop("json_schema_extra", {}) or {})
+    extra[CREATED_AT_MARKER] = True
+    return Field(default=None, json_schema_extra=extra, **kwargs)
+
+
+def is_created_at_field(field: FieldInfo) -> bool:
+    """Return ``True`` if a Pydantic field was declared via :func:`created_at_attr`."""
+    extra = field.json_schema_extra
+    return isinstance(extra, dict) and bool(extra.get(CREATED_AT_MARKER))
+
+
+def updated_at_attr(**kwargs: Any) -> Any:
+    """Mark a ``datetime | None`` field as the auto-managed modification timestamp.
+
+    On every ``put`` the field is stamped with ``datetime.now(timezone.utc)``. On
+    ``update`` it is stamped too, unless the caller explicitly supplies it in
+    ``set=`` (in which case the caller's value wins).
+    """
+    extra = dict(kwargs.pop("json_schema_extra", {}) or {})
+    extra[UPDATED_AT_MARKER] = True
+    return Field(default=None, json_schema_extra=extra, **kwargs)
+
+
+def is_updated_at_field(field: FieldInfo) -> bool:
+    """Return ``True`` if a Pydantic field was declared via :func:`updated_at_attr`."""
+    extra = field.json_schema_extra
+    return isinstance(extra, dict) and bool(extra.get(UPDATED_AT_MARKER))
