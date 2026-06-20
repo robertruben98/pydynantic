@@ -5,6 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
+from .observability import OperationHook, _ClientProxy
+
 if TYPE_CHECKING:
     from .entity import Entity
 
@@ -33,6 +35,7 @@ class Table:
         sk: str | None = "SK",
         indexes: dict[str, dict[str, str]] | None = None,
         client: Any = None,
+        on_operation: OperationHook | None = None,
     ) -> None:
         self.name = name
         self.pk = pk
@@ -44,7 +47,9 @@ class Table:
             import boto3
 
             client = boto3.client("dynamodb")
-        self.client = client
+        self.client: Any = (
+            _ClientProxy(client, self.name, on_operation) if on_operation is not None else client
+        )
         # entity name -> entity class, used to discriminate items on read.
         self._entities: dict[str, type[Entity]] = {}
 

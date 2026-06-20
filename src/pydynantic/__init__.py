@@ -19,6 +19,7 @@ from .errors import (
 )
 from .expressions import Condition, F, attr_exists, attr_not_exists
 from .keys import KeyDefinition, key
+from .observability import OperationEvent, OperationHook
 from .pagination import Page, decode_cursor, encode_cursor
 from .query import QueryBuilder, QueryNamespace, ScanBuilder
 from .table import Index, Table
@@ -57,6 +58,9 @@ __all__ = [
     # Transactions
     "transaction",
     "Transaction",
+    # Observability
+    "OperationEvent",
+    "OperationHook",
     # Errors
     "PydynanticError",
     "ItemNotFoundError",
