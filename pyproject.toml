@@ -37,6 +37,7 @@ dev = [
     "pre-commit>=3.7",
     "boto3-stubs[dynamodb]",
     "hypothesis>=6.0",
+    "pytest-benchmark>=4.0",
 ]
 
 [project.urls]
