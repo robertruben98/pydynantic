@@ -29,12 +29,27 @@ def _backoff(attempt: int) -> None:
     time.sleep(min(2 ** (attempt - 1) * 0.05, 1.0))
 
 
-def batch_get(entity_cls: type[E], keys: list[Any], *, consistent: bool = False) -> list[E]:
-    """Fetch many items by key, in chunks of 100, retrying ``UnprocessedKeys``."""
+def batch_get(
+    entity_cls: type[E],
+    keys: list[Any],
+    *,
+    consistent: bool = False,
+    attributes: list[str] | None = None,
+) -> list[E]:
+    """Fetch many items by key, in chunks of 100, retrying ``UnprocessedKeys``.
+
+    ``attributes`` limits the response to a projection of attribute paths;
+    omitted fields fall back to their model defaults (or fail validation if
+    required), so include everything the entity needs to construct.
+    """
     from .entity import map_client_error
+    from .expressions import ExpressionContext
 
     table = entity_cls.__entity_table__
     client = table.client
+
+    context = ExpressionContext()
+    projection = ", ".join(context.name(a) for a in attributes) if attributes else None
     # DynamoDB rejects a BatchGetItem with duplicate keys; dedupe while
     # preserving first-seen order.
     seen: set[str] = set()
@@ -49,7 +64,11 @@ def batch_get(entity_cls: type[E], keys: list[Any], *, consistent: bool = False)
     results: list[E] = []
 
     for chunk in _chunks(raw_keys, BATCH_GET_LIMIT):
-        request: dict[str, Any] = {table.name: {"Keys": list(chunk), "ConsistentRead": consistent}}
+        table_request: dict[str, Any] = {"Keys": list(chunk), "ConsistentRead": consistent}
+        if projection is not None:
+            table_request["ProjectionExpression"] = projection
+            table_request["ExpressionAttributeNames"] = context.names
+        request: dict[str, Any] = {table.name: table_request}
         attempt = 0
         while request:
             try:

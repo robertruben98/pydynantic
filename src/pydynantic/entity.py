@@ -370,11 +370,22 @@ class Entity(BaseModel, metaclass=EntityMeta):
 
     # -- batch (delegates to the batch module) ------------------------------
     @classmethod
-    def batch_get(cls, keys: list[Any], *, consistent: bool = False) -> list[Self]:
-        """Fetch many items by key, chunking and retrying transparently."""
+    def batch_get(
+        cls,
+        keys: list[Any],
+        *,
+        consistent: bool = False,
+        attributes: list[str] | None = None,
+    ) -> list[Self]:
+        """Fetch many items by key, chunking and retrying transparently.
+
+        ``attributes`` limits the response to a projection of attribute paths;
+        omitted fields fall back to their model defaults (or fail validation if
+        required), so include everything the entity needs to construct.
+        """
         from .batch import batch_get
 
-        return batch_get(cls, keys, consistent=consistent)
+        return batch_get(cls, keys, consistent=consistent, attributes=attributes)
 
     @classmethod
     def batch_write(

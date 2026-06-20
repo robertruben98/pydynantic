@@ -37,6 +37,36 @@ def test_collection_all_merges(models: object) -> None:
     assert len(result.all()) == 2
 
 
+def test_collection_projection_buckets(models: object) -> None:
+    User = models.User  # type: ignore[attr-defined]
+    OrgData = models.OrgData  # type: ignore[attr-defined]
+
+    # Projection attributes are User fields; seed only Users so every projected
+    # item can still construct (a cross-entity projection cannot satisfy members
+    # whose required fields are projected away).
+    User.put(User(user_id="u1", org_id="acme", email="a@x.com", name="Ana"))
+    User.put(User(user_id="u2", org_id="acme", email="b@x.com", name="Bob"))
+
+    # A projection that omits __entity__ would drop every item; the query must
+    # auto-include the discriminator so bucketing still works.
+    result = OrgData.query(org_id="acme", attributes=["user_id", "org_id", "email", "name"]).all()
+
+    assert {u.user_id for u in result.users} == {"u1", "u2"}
+    assert all(isinstance(u, User) for u in result.users)
+
+
+def test_collection_projection_omits_field(models: object) -> None:
+    User = models.User  # type: ignore[attr-defined]
+    OrgData = models.OrgData  # type: ignore[attr-defined]
+
+    User.put(User(user_id="u1", org_id="acme", email="a@x.com", name="Ana", login_count=42))
+
+    result = OrgData.query(org_id="acme", attributes=["user_id", "org_id", "email", "name"]).all()
+
+    # login_count was projected away, so it falls back to its model default.
+    assert [u.login_count for u in result.users] == [0]
+
+
 def test_collection_empty_partition(models: object) -> None:
     result = models.OrgData.query(org_id="ghost").all()  # type: ignore[attr-defined]
     assert result.users == []

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, ClassVar
 
+from .entity import ENTITY_ATTR
 from .expressions import ExpressionContext
 from .marshalling import deserialize_item
 
@@ -39,7 +40,13 @@ class CollectionResult:
 class CollectionQuery:
     """A query over a single partition that may contain several entity types."""
 
-    def __init__(self, collection_cls: type[Collection], pk_attrs: dict[str, Any]) -> None:
+    def __init__(
+        self,
+        collection_cls: type[Collection],
+        pk_attrs: dict[str, Any],
+        *,
+        attributes: list[str] | None = None,
+    ) -> None:
         members = collection_cls.members
         if not members:
             raise ValueError(f"{collection_cls.__name__} declares no members")
@@ -48,6 +55,7 @@ class CollectionQuery:
         self._table = members[0].__entity_table__
         self._pk_attr = primary.pk_attr
         self._pk_value = primary.build_pk(pk_attrs)
+        self._projection = attributes
 
     def all(self) -> CollectionResult:
         """Run the query and return items bucketed by entity type."""
@@ -56,9 +64,15 @@ class CollectionQuery:
         params: dict[str, Any] = {
             "TableName": self._table.name,
             "KeyConditionExpression": key_condition,
-            "ExpressionAttributeNames": context.names,
-            "ExpressionAttributeValues": context.values,
         }
+        if self._projection:
+            # Discrimination reads the ``__entity__`` attribute; a projection
+            # that omits it would drop every item, so always include it.
+            effective_names = list(dict.fromkeys([ENTITY_ATTR, *self._projection]))
+            params["ProjectionExpression"] = ", ".join(context.name(a) for a in effective_names)
+        # Assign names AFTER projection paths register so they are included.
+        params["ExpressionAttributeNames"] = context.names
+        params["ExpressionAttributeValues"] = context.values
 
         buckets: dict[str, list[Any]] = {_bucket_name(member): [] for member in self._members}
         by_name = {member.__entity_name__: member for member in self._members}
@@ -95,5 +109,12 @@ class Collection:
     members: ClassVar[list[type[Entity]]] = []
 
     @classmethod
-    def query(cls, **pk_attrs: Any) -> CollectionQuery:
-        return CollectionQuery(cls, pk_attrs)
+    def query(cls, *, attributes: list[str] | None = None, **pk_attrs: Any) -> CollectionQuery:
+        """Query a partition for all member entity types.
+
+        ``attributes`` limits the response to a projection of attribute paths;
+        omitted fields fall back to their model defaults (or fail validation if
+        required), so include everything each member needs to construct. The
+        discriminator attribute is always included so bucketing still works.
+        """
+        return CollectionQuery(cls, pk_attrs, attributes=attributes)
