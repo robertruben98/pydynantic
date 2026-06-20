@@ -30,7 +30,7 @@ Fill the obvious holes a user hits in week one.
 
 - [x] **`ConsistentRead` on queries** — expose it on `QueryBuilder` (mirrors
       `get(consistent=...)`); GSIs reject it, so validate and raise early.
-- [ ] **Projection on `batch_get` and collections** — `ProjectionExpression`
+- [x] **Projection on `batch_get` and collections** — `ProjectionExpression`
       already exists on `get`/`query`/`scan`; extend it to the remaining reads.
 - [ ] **`ReturnValues` on `put`/`delete`** — return the previous item where the
       caller asks (e.g. `delete(..., return_values="ALL_OLD")`).

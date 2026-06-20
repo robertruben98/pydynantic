@@ -41,6 +41,43 @@ def test_batch_get_chunks_over_100(models: object) -> None:
     assert len(fetched) == 150
 
 
+def test_batch_get_projection(models: object) -> None:
+    User = models.User  # type: ignore[attr-defined]
+    for i in range(3):
+        User.put(
+            User(
+                user_id=f"u{i}",
+                org_id="acme",
+                email=f"u{i}@x.com",
+                name=f"N{i}",
+                login_count=7,
+            )
+        )
+    fetched = User.batch_get(
+        [("acme", f"u{i}") for i in range(3)],
+        attributes=["user_id", "org_id", "email", "name"],
+    )
+    assert {u.user_id for u in fetched} == {"u0", "u1", "u2"}
+    assert all(isinstance(u, User) for u in fetched)
+    # login_count was projected away, so it falls back to its model default.
+    assert all(u.login_count == 0 for u in fetched)
+
+
+def test_batch_get_projection_over_100(models: object) -> None:
+    User = models.User  # type: ignore[attr-defined]
+    users = [
+        User(user_id=f"u{i}", org_id="acme", email=f"u{i}@x.com", name="N", login_count=5)
+        for i in range(150)
+    ]
+    User.batch_write(puts=users)
+    fetched = User.batch_get(
+        [("acme", f"u{i}") for i in range(150)],
+        attributes=["user_id", "org_id", "email", "name"],
+    )
+    assert len(fetched) == 150
+    assert all(u.login_count == 0 for u in fetched)
+
+
 def test_batch_write_deletes(models: object) -> None:
     User = models.User  # type: ignore[attr-defined]
     seed(models, 3)

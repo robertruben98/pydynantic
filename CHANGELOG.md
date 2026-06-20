@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - `QueryBuilder.consistent(value=True)` — request a strongly consistent read
   (`ConsistentRead`); mirrors `get(consistent=...)` and rejects use on a GSI.
+- `attributes=` projection on `Entity.batch_get` and `Collection.query` —
+  limit reads to a `ProjectionExpression` (projected-away fields fall back to
+  model defaults); collections auto-include the `__entity__` discriminator.
 
 ## [0.2.0] - 2026-06-20
 
