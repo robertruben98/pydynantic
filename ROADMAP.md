@@ -37,7 +37,7 @@ Fill the obvious holes a user hits in week one.
 - [x] **TTL attribute support** — a `ttl_attr()` marker (like `version_attr()`)
       that serializes a `datetime`/`int` to the epoch-seconds attribute DynamoDB
       expects, so TTL-configured tables work without manual conversion.
-- [ ] **Auto-timestamps** — opt-in `created_at` / `updated_at` helpers that the
+- [x] **Auto-timestamps** — opt-in `created_at` / `updated_at` helpers that the
       ORM stamps on `put`/`update`.
 - [x] **Collection pagination** — `CollectionQuery` currently drains every page;
       add `.limit()` / `.page(cursor=...)` parity with `QueryBuilder`.
