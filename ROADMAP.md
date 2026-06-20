@@ -32,7 +32,7 @@ Fill the obvious holes a user hits in week one.
       `get(consistent=...)`); GSIs reject it, so validate and raise early.
 - [x] **Projection on `batch_get` and collections** — `ProjectionExpression`
       already exists on `get`/`query`/`scan`; extend it to the remaining reads.
-- [ ] **`ReturnValues` on `put`/`delete`** — return the previous item where the
+- [x] **`ReturnValues` on `put`/`delete`** — return the previous item where the
       caller asks (e.g. `delete(..., return_values="ALL_OLD")`).
 - [ ] **TTL attribute support** — a `ttl_attr()` marker (like `version_attr()`)
       that serializes a `datetime`/`int` to the epoch-seconds attribute DynamoDB

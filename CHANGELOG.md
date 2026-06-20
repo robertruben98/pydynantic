@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `attributes=` projection on `Entity.batch_get` and `Collection.query` —
   limit reads to a `ProjectionExpression` (projected-away fields fall back to
   model defaults); collections auto-include the `__entity__` discriminator.
+- `return_values=` on `Entity.put` and `Entity.delete` (`NONE` | `ALL_OLD`) —
+  `delete(..., return_values="ALL_OLD")` returns the deleted item (or `None`);
+  `put` still always returns the written item.
 
 ## [0.2.0] - 2026-06-20
 

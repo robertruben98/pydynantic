@@ -39,6 +39,9 @@ ENTITY_ATTR = "__entity__"
 
 E = TypeVar("E", bound="Entity")
 
+#: ``ReturnValues`` values DynamoDB accepts on ``PutItem`` / ``DeleteItem``.
+_ALLOWED_RETURN_VALUES = {"NONE", "ALL_OLD"}
+
 
 def map_client_error(exc: ClientError, *, versioned: bool = False) -> PydynanticError:
     """Translate a botocore ``ClientError`` into the pydynantic hierarchy."""
@@ -203,8 +206,27 @@ class Entity(BaseModel, metaclass=EntityMeta):
 
     # -- CRUD ---------------------------------------------------------------
     @classmethod
-    def put(cls, item: Self, *, condition: Condition | None = None) -> Self:
-        """Create or replace an item. Supports optimistic locking and conditions."""
+    def put(
+        cls,
+        item: Self,
+        *,
+        condition: Condition | None = None,
+        return_values: str = "NONE",
+    ) -> Self:
+        """Create or replace an item. Supports optimistic locking and conditions.
+
+        ``put`` always returns the **written** item (the object you passed in),
+        so ``put(x) is x``. ``return_values="ALL_OLD"`` asks DynamoDB to surface
+        the pre-write stored state at the API level, but ``put``'s return value
+        is unchanged — and with optimistic locking the returned object carries
+        the bumped version. Only ``NONE`` and ``ALL_OLD`` are valid.
+        """
+        if return_values not in _ALLOWED_RETURN_VALUES:
+            raise PydynanticError(
+                f"return_values must be one of {sorted(_ALLOWED_RETURN_VALUES)}, "
+                f"got {return_values!r}"
+            )
+
         version_field = cls.__version_field__
         versioned = version_field is not None
         current = 0
@@ -215,6 +237,8 @@ class Entity(BaseModel, metaclass=EntityMeta):
             condition = lock if condition is None else (condition & lock)
 
         params: dict[str, Any] = {"TableName": cls._table_name(), "Item": item.to_dynamo()}
+        if return_values != "NONE":
+            params["ReturnValues"] = return_values
         if condition is not None:
             context = ExpressionContext()
             params["ConditionExpression"] = _compile_condition(condition, context)
@@ -271,12 +295,31 @@ class Entity(BaseModel, metaclass=EntityMeta):
         return result
 
     @classmethod
-    def delete(cls, *, condition: Condition | None = None, **key_attrs: Any) -> None:
-        """Delete an item by its primary key."""
+    def delete(
+        cls,
+        *,
+        condition: Condition | None = None,
+        return_values: str = "NONE",
+        **key_attrs: Any,
+    ) -> Self | None:
+        """Delete an item by its primary key.
+
+        With ``return_values="ALL_OLD"`` the deleted item is returned (or
+        ``None`` if it did not exist); otherwise ``delete`` returns ``None``.
+        Only ``NONE`` and ``ALL_OLD`` are valid.
+        """
+        if return_values not in _ALLOWED_RETURN_VALUES:
+            raise PydynanticError(
+                f"return_values must be one of {sorted(_ALLOWED_RETURN_VALUES)}, "
+                f"got {return_values!r}"
+            )
+
         params: dict[str, Any] = {
             "TableName": cls._table_name(),
             "Key": cls.build_key(key_attrs),
         }
+        if return_values != "NONE":
+            params["ReturnValues"] = return_values
         if condition is not None:
             context = ExpressionContext()
             params["ConditionExpression"] = _compile_condition(condition, context)
@@ -284,9 +327,16 @@ class Entity(BaseModel, metaclass=EntityMeta):
             if context.values:
                 params["ExpressionAttributeValues"] = context.values
         try:
-            cls._client().delete_item(**params)
+            response = cls._client().delete_item(**params)
         except ClientError as exc:
             raise map_client_error(exc) from exc
+
+        if return_values == "NONE":
+            return None
+        attributes = response.get("Attributes")
+        if not attributes:
+            return None
+        return cls.from_dynamo(attributes)
 
     @classmethod
     def update(
