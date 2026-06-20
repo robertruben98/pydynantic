@@ -69,7 +69,10 @@ class CollectionQuery:
     ) -> None:
         members = collection_cls.members
         if not members:
-            raise ValueError(f"{collection_cls.__name__} declares no members")
+            raise ValueError(
+                f"{collection_cls.__name__} declares no members; list at least one entity "
+                "class in its 'members' attribute."
+            )
         primary = members[0].__primary_key__
         self._members = members
         self._table = members[0].__entity_table__

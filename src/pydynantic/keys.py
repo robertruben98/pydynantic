@@ -70,7 +70,10 @@ def parse(template: str, value: str) -> dict[str, str]:
 
     matched = re.match(pattern, value)
     if matched is None:
-        raise KeyTemplateError(f"Value {value!r} does not match template {template!r}")
+        raise KeyTemplateError(
+            f"Value {value!r} does not match template {template!r}; the key string must "
+            "share the template's literal separators for its placeholders to parse."
+        )
     return matched.groupdict()
 
 
@@ -113,16 +116,12 @@ class KeyDefinition:
             self.sk_attr = table.sk
         else:
             if self.index not in table.indexes:
-                raise KeyTemplateError(
-                    f"Key {name!r} references unknown index {self.index!r}"
-                )
+                raise KeyTemplateError(f"Key {name!r} references unknown index {self.index!r}")
             index = table.indexes[self.index]
             self.pk_attr = index.pk
             self.sk_attr = index.sk
         if self.sk_template is not None and self.sk_attr is None:
-            raise KeyTemplateError(
-                f"Key {name!r} defines a sort key but its index has no sort key"
-            )
+            raise KeyTemplateError(f"Key {name!r} defines a sort key but its index has no sort key")
 
     def build_pk(self, attrs: dict[str, Any]) -> str:
         """Render the partition-key string from the given attribute values."""

@@ -83,7 +83,9 @@ def batch_get(
             attempt += 1
             if attempt > _MAX_RETRIES:
                 raise RuntimeError(
-                    f"batch_get gave up after {attempt} retries with unprocessed keys"
+                    f"batch_get gave up after {attempt} retries with unprocessed keys; "
+                    "DynamoDB is likely throttling the request, so reduce the batch size "
+                    "or provision more read capacity and retry."
                 )
             _backoff(attempt)
             request = unprocessed
@@ -123,7 +125,9 @@ def batch_write(
             attempt += 1
             if attempt > _MAX_RETRIES:
                 raise RuntimeError(
-                    f"batch_write gave up after {attempt} retries with unprocessed items"
+                    f"batch_write gave up after {attempt} retries with unprocessed items; "
+                    "DynamoDB is likely throttling the request, so reduce the batch size "
+                    "or provision more write capacity and retry."
                 )
             _backoff(attempt)
             request = unprocessed

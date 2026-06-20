@@ -38,7 +38,10 @@ class QueryBuilder(Generic[E]):
     # -- sort key conditions ------------------------------------------------
     def _with_sk(self, operator: str, *args: Any) -> QueryBuilder[E]:
         if self._key.sk_attr is None:
-            raise ValueError(f"Key {self._key.name!r} has no sort key to filter on")
+            raise ValueError(
+                f"Key {self._key.name!r} has no sort key to filter on; declare an sk= "
+                "template on this key or query by partition key alone."
+            )
         self._sk = (operator, args)
         return self
 
@@ -92,7 +95,10 @@ class QueryBuilder(Generic[E]):
         consistent read against an index is rejected eagerly.
         """
         if value and self._key.index is not None:
-            raise ValueError(f"Index {self._key.index!r} (GSI) does not support consistent reads")
+            raise ValueError(
+                f"Index {self._key.index!r} (GSI) does not support consistent reads; "
+                "drop the consistent_read() call or query the table's primary key instead."
+            )
         self._consistent = value
         return self
 
@@ -257,7 +263,10 @@ class QueryNamespace(Generic[E]):
     def __getattr__(self, name: str) -> Callable[..., QueryBuilder[E]]:
         keys = self._entity.__keys__
         if name not in keys:
-            raise AttributeError(f"{self._entity.__name__!r} has no access pattern named {name!r}")
+            raise AttributeError(
+                f"{self._entity.__name__!r} has no access pattern named {name!r}; "
+                f"declared keys are {sorted(keys)}."
+            )
         key_def = keys[name]
 
         def builder(**pk_attrs: Any) -> QueryBuilder[E]:
