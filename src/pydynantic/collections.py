@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, ClassVar
 
 from .entity import ENTITY_ATTR
 from .expressions import ExpressionContext
 from .marshalling import deserialize_item
+from .pagination import decode_cursor, encode_cursor
 
 if TYPE_CHECKING:
     from .entity import Entity
@@ -37,6 +39,24 @@ class CollectionResult:
         return merged
 
 
+@dataclass
+class CollectionPage:
+    """A single page of a collection query plus a cursor for the next page.
+
+    ``result`` is a :class:`CollectionResult` bucketing the page's items by
+    entity type; ``cursor`` is an opaque next-page token (``None`` when the
+    partition is drained).
+    """
+
+    result: CollectionResult
+    cursor: str | None = None
+
+    @property
+    def has_more(self) -> bool:
+        """Whether another page is available (a cursor was returned)."""
+        return self.cursor is not None
+
+
 class CollectionQuery:
     """A query over a single partition that may contain several entity types."""
 
@@ -56,9 +76,21 @@ class CollectionQuery:
         self._pk_attr = primary.pk_attr
         self._pk_value = primary.build_pk(pk_attrs)
         self._projection = attributes
+        self._limit: int | None = None
 
-    def all(self) -> CollectionResult:
-        """Run the query and return items bucketed by entity type."""
+    def limit(self, count: int) -> CollectionQuery:
+        """Bound the number of items DynamoDB reads per ``page()`` call.
+
+        DynamoDB applies ``Limit`` to items READ from the partition *before*
+        entity discrimination, so a page's bucketed total may be smaller than
+        ``count`` (items of unknown entity types are dropped after the read).
+        ``all()`` ignores this limit and always drains every page.
+        """
+        self._limit = count
+        return self
+
+    def _build_params(self) -> dict[str, Any]:
+        """Build the shared query request params (key condition + projection)."""
         context = ExpressionContext()
         key_condition = f"{context.name(self._pk_attr)} = {context.value(self._pk_value)}"
         params: dict[str, Any] = {
@@ -73,9 +105,28 @@ class CollectionQuery:
         # Assign names AFTER projection paths register so they are included.
         params["ExpressionAttributeNames"] = context.names
         params["ExpressionAttributeValues"] = context.values
+        return params
 
+    def _bucket(self, response: dict[str, Any]) -> dict[str, list[Any]]:
+        """Bucket a single query response's items by member entity type."""
         buckets: dict[str, list[Any]] = {_bucket_name(member): [] for member in self._members}
         by_name = {member.__entity_name__: member for member in self._members}
+        for raw in response.get("Items", []):
+            data = deserialize_item(raw)
+            entity_name = data.get("__entity__")
+            member = by_name.get(entity_name) if isinstance(entity_name, str) else None
+            if member is None:
+                continue
+            buckets[_bucket_name(member)].append(member.from_dynamo(raw))
+        return buckets
+
+    def all(self) -> CollectionResult:
+        """Run the query and return items bucketed by entity type.
+
+        Drains every page regardless of any ``limit()`` set.
+        """
+        params = self._build_params()
+        buckets: dict[str, list[Any]] = {_bucket_name(member): [] for member in self._members}
 
         start_key: dict[str, Any] | None = None
         client = self._table.client
@@ -84,17 +135,30 @@ class CollectionQuery:
             if start_key is not None:
                 page_params["ExclusiveStartKey"] = start_key
             response = client.query(**page_params)
-            for raw in response.get("Items", []):
-                data = deserialize_item(raw)
-                entity_name = data.get("__entity__")
-                member = by_name.get(entity_name) if isinstance(entity_name, str) else None
-                if member is None:
-                    continue
-                buckets[_bucket_name(member)].append(member.from_dynamo(raw))
+            for name, items in self._bucket(response).items():
+                buckets[name].extend(items)
             start_key = response.get("LastEvaluatedKey")
             if not start_key:
                 break
         return CollectionResult(buckets)
+
+    def page(self, cursor: str | None = None) -> CollectionPage:
+        """Return a single page of bucketed results plus a next-page cursor.
+
+        Runs exactly one ``query``. When ``limit()`` is set, DynamoDB bounds the
+        items READ from the partition *before* discrimination, so the page's
+        bucketed total may be smaller than the limit. The returned ``cursor`` is
+        the table PK/SK of the last evaluated key (``None`` once drained).
+        """
+        params = self._build_params()
+        if self._limit is not None:
+            params["Limit"] = self._limit
+        start_key = decode_cursor(cursor)
+        if start_key is not None:
+            params["ExclusiveStartKey"] = start_key
+        response = self._table.client.query(**params)
+        result = CollectionResult(self._bucket(response))
+        return CollectionPage(result=result, cursor=encode_cursor(response.get("LastEvaluatedKey")))
 
 
 class Collection:
