@@ -3,6 +3,7 @@
 [![PyPI version](https://img.shields.io/pypi/v/pydynantic.svg)](https://pypi.org/project/pydynantic/)
 [![Python versions](https://img.shields.io/pypi/pyversions/pydynantic.svg)](https://pypi.org/project/pydynantic/)
 [![CI](https://github.com/robertruben98/pydynantic/actions/workflows/ci.yml/badge.svg)](https://github.com/robertruben98/pydynantic/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/robertruben98/pydynantic/branch/main/graph/badge.svg)](https://codecov.io/gh/robertruben98/pydynantic)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/robertruben98/pydynantic/blob/main/LICENSE)
 [![Typed](https://img.shields.io/badge/typed-mypy%20strict-blue.svg)](https://mypy.readthedocs.io/)
 
