@@ -1,0 +1,74 @@
+site_name: pydynantic
+site_description: Single-table design for DynamoDB in Python, with typed entities on top of Pydantic v2.
+repo_url: https://github.com/robertruben98/pydynantic
+repo_name: robertruben98/pydynantic
+strict: true
+
+theme:
+  name: material
+  features:
+    - navigation.sections
+    - navigation.tabs
+    - navigation.top
+    - content.code.copy
+    - content.tabs.link
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [src]
+          options:
+            show_source: false
+            docstring_style: google
+            members_order: source
+            show_root_heading: true
+            separate_signature: true
+
+markdown_extensions:
+  - admonition
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.snippets
+  - toc:
+      permalink: true
+
+nav:
+  - Home: index.md
+  - Concepts:
+      - Single-table design: concepts/single-table-design.md
+  - Guide:
+      - Entities & keys: guide/entities-and-keys.md
+      - CRUD: guide/crud.md
+      - Queries: guide/queries.md
+      - Filters & conditions: guide/filters-and-conditions.md
+      - Pagination: guide/pagination.md
+      - Batch: guide/batch.md
+      - Transactions: guide/transactions.md
+      - Collections: guide/collections.md
+      - Optimistic locking: guide/optimistic-locking.md
+      - TTL & timestamps: guide/ttl-and-timestamps.md
+      - Marshalling: guide/marshalling.md
+  - Recipes: recipes.md
+  - Migrating:
+      - From ElectroDB: migrating/from-electrodb.md
+      - From DynamoDB-Toolbox: migrating/from-dynamodb-toolbox.md
+  - API reference: reference/api.md

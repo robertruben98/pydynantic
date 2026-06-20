@@ -39,6 +39,11 @@ dev = [
     "hypothesis>=6.0",
     "pytest-benchmark>=4.0",
 ]
+docs = [
+    "mkdocs>=1.6,<2",
+    "mkdocs-material>=9.5,<10",
+    "mkdocstrings[python]>=0.25,<0.30",
+]
 
 [project.urls]
 Homepage = "https://github.com/robertruben98/pydynantic"
