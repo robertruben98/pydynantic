@@ -10,6 +10,7 @@ from uuid import UUID
 import pytest
 from pydantic import BaseModel
 
+from pydynantic.errors import PydynanticError
 from pydynantic.marshalling import deserialize, serialize, serialize_item
 
 
@@ -97,6 +98,96 @@ def test_deserialize_roundtrip() -> None:
 def test_serialize_item_skips_none_and_empty_sets() -> None:
     item = serialize_item({"a": 1, "b": None, "c": set(), "d": "x"})
     assert item == {"a": {"N": "1"}, "d": {"S": "x"}}
+
+
+# --- Empty strings are intentionally retained (DynamoDB allows them) ---------
+
+
+def test_empty_string_serializes_to_S() -> None:
+    assert serialize("") == {"S": ""}
+
+
+def test_empty_string_value_roundtrips() -> None:
+    assert deserialize(serialize("")) == ""
+
+
+def test_empty_string_in_list_roundtrips() -> None:
+    av = serialize(["", "x"])
+    assert av == {"L": [{"S": ""}, {"S": "x"}]}
+    assert deserialize(av) == ["", "x"]
+
+
+def test_empty_string_as_map_value_roundtrips() -> None:
+    av = serialize({"k": ""})
+    assert av == {"M": {"k": {"S": ""}}}
+    assert deserialize(av) == {"k": ""}
+
+
+def test_empty_string_as_set_element_roundtrips() -> None:
+    av = serialize({"", "x"})
+    assert set(av["SS"]) == {"", "x"}
+    assert deserialize(av) == {"", "x"}
+
+
+def test_serialize_item_retains_empty_string() -> None:
+    item = serialize_item({"a": "", "b": None})
+    assert item == {"a": {"S": ""}}
+
+
+# --- Typed sets: mixed element types are rejected early ----------------------
+
+
+def test_number_set_mixed_int_and_decimal_is_valid_NS() -> None:
+    result = serialize({1, Decimal(2)})
+    assert set(result["NS"]) == {"1", "2"}
+
+
+def test_binary_set_is_valid_BS() -> None:
+    result = serialize({b"a", b"b"})
+    assert set(result["BS"]) == {b"a", b"b"}
+
+
+def test_mixed_type_set_raises_pydynantic_error() -> None:
+    with pytest.raises(PydynanticError) as excinfo:
+        serialize({"a", 1})
+    message = str(excinfo.value)
+    assert "str" in message
+    assert "int" in message
+
+
+def test_empty_set_still_omitted_by_serialize_item() -> None:
+    item = serialize_item({"a": set(), "b": 1})
+    assert item == {"b": {"N": "1"}}
+
+
+# --- Number precision / range validation -------------------------------------
+
+
+def test_float_out_of_range_raises_pydynantic_error() -> None:
+    with pytest.raises(PydynanticError):
+        serialize(1e200)
+
+
+def test_decimal_out_of_range_raises_pydynantic_error() -> None:
+    with pytest.raises(PydynanticError):
+        serialize(Decimal("1e200"))
+
+
+def test_decimal_excessive_significant_digits_raises() -> None:
+    with pytest.raises(PydynanticError):
+        serialize(Decimal("1" * 39))
+
+
+def test_decimal_trailing_zero_preserved_regression() -> None:
+    assert serialize(Decimal("1.50")) == {"N": "1.50"}
+
+
+def test_normal_numbers_unaffected() -> None:
+    assert serialize(5) == {"N": "5"}
+    assert serialize(-42) == {"N": "-42"}
+    assert serialize(1.5) == {"N": "1.5"}
+    assert serialize(Decimal("3.14159")) == {"N": "3.14159"}
+    assert serialize(10**30) == {"N": "1" + "0" * 30}
 
 
 def test_full_entity_type_roundtrip(models: object) -> None:
