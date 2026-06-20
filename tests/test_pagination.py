@@ -2,10 +2,19 @@
 
 from __future__ import annotations
 
+import base64
+import json
+
 import pytest
 
 from pydynantic.errors import PydynanticError
 from pydynantic.pagination import decode_cursor, encode_cursor
+
+
+def _make_cursor(payload: object) -> str:
+    """Base64url-encode crafted JSON the way a malicious/stale client might."""
+    raw = json.dumps(payload).encode("utf-8")
+    return base64.urlsafe_b64encode(raw).decode("ascii").rstrip("=")
 
 
 def seed(models: object, n: int) -> None:
@@ -38,9 +47,57 @@ def test_bytes_key_roundtrip() -> None:
     assert decode_cursor(encode_cursor(lek)) == lek
 
 
+def test_encoded_cursor_has_no_padding() -> None:
+    cursor = encode_cursor({"PK": {"S": "ORG#acme"}, "SK": {"S": "USER#u1"}})
+    assert cursor is not None
+    assert "=" not in cursor
+
+
 def test_invalid_cursor_raises() -> None:
     with pytest.raises(PydynanticError):
         decode_cursor("!!!not-base64!!!")
+
+
+def test_tampered_base64_raises() -> None:
+    with pytest.raises(PydynanticError):
+        decode_cursor("@@@@")
+
+
+def test_valid_base64_non_json_raises() -> None:
+    cursor = base64.urlsafe_b64encode(b"\xff\xfenot json").decode("ascii").rstrip("=")
+    with pytest.raises(PydynanticError):
+        decode_cursor(cursor)
+
+
+@pytest.mark.parametrize("payload", [42, "scalar", [], [1, 2, 3]])
+def test_payload_not_a_dict_raises(payload: object) -> None:
+    with pytest.raises(PydynanticError):
+        decode_cursor(_make_cursor(payload))
+
+
+def test_missing_version_raises() -> None:
+    with pytest.raises(PydynanticError):
+        decode_cursor(_make_cursor({"k": {"PK": {"S": "x"}}}))
+
+
+def test_wrong_version_raises() -> None:
+    with pytest.raises(PydynanticError):
+        decode_cursor(_make_cursor({"v": 2, "k": {"PK": {"S": "x"}}}))
+
+
+def test_missing_key_raises() -> None:
+    with pytest.raises(PydynanticError):
+        decode_cursor(_make_cursor({"v": 1}))
+
+
+def test_key_not_a_dict_raises() -> None:
+    with pytest.raises(PydynanticError):
+        decode_cursor(_make_cursor({"v": 1, "k": ["not", "a", "dict"]}))
+
+
+def test_key_entry_value_not_a_dict_raises() -> None:
+    with pytest.raises(PydynanticError):
+        decode_cursor(_make_cursor({"v": 1, "k": {"PK": "not-an-attributevalue"}}))
 
 
 def test_page_walks_all_items(models: object) -> None:
