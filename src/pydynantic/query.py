@@ -6,7 +6,7 @@ from collections.abc import Callable, Iterator
 from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
 from .errors import ItemNotFoundError, MultipleResultsError
-from .expressions import Condition, ExpressionContext
+from .expressions import Condition, ExpressionContext, F
 from .keys import KeyDefinition
 from .pagination import Page, decode_cursor, encode_cursor
 
@@ -32,6 +32,7 @@ class QueryBuilder(Generic[E]):
         self._filter: Condition | None = None
         self._limit: int | None = None
         self._forward = True
+        self._projection: list[str] | None = None
 
     # -- sort key conditions ------------------------------------------------
     def _with_sk(self, operator: str, *args: Any) -> QueryBuilder[E]:
@@ -70,6 +71,11 @@ class QueryBuilder(Generic[E]):
         self._limit = count
         return self
 
+    def attributes(self, names: list[str]) -> QueryBuilder[E]:
+        """Project only ``names``; omitted fields fall back to model defaults."""
+        self._projection = names
+        return self
+
     def ascending(self) -> QueryBuilder[E]:
         self._forward = True
         return self
@@ -104,6 +110,8 @@ class QueryBuilder(Generic[E]):
             params["IndexName"] = self._key.index
         if self._filter is not None:
             params["FilterExpression"] = self._filter.compile(context)
+        if self._projection:
+            params["ProjectionExpression"] = ", ".join(context.name(a) for a in self._projection)
         if not self._forward:
             params["ScanIndexForward"] = False
         params["ExpressionAttributeNames"] = context.names
@@ -173,6 +181,24 @@ class QueryBuilder(Generic[E]):
         items = [self._entity.from_dynamo(raw) for raw in response.get("Items", [])]
         return Page(items=items, cursor=encode_cursor(response.get("LastEvaluatedKey")))
 
+    def count(self) -> int:
+        """Count matching items server-side without materialising them."""
+        client = self._entity.__entity_table__.client
+        params = self._build_params()
+        params["Select"] = "COUNT"
+        params.pop("ProjectionExpression", None)
+        total = 0
+        start_key: dict[str, Any] | None = None
+        while True:
+            page_params = dict(params)
+            if start_key is not None:
+                page_params["ExclusiveStartKey"] = start_key
+            response = client.query(**page_params)
+            total += int(response.get("Count", 0))
+            start_key = response.get("LastEvaluatedKey")
+            if not start_key:
+                return total
+
 
 class QueryNamespace(Generic[E]):
     """``Entity.query`` accessor exposing one builder per declared key."""
@@ -183,12 +209,114 @@ class QueryNamespace(Generic[E]):
     def __getattr__(self, name: str) -> Callable[..., QueryBuilder[E]]:
         keys = self._entity.__keys__
         if name not in keys:
-            raise AttributeError(
-                f"{self._entity.__name__!r} has no access pattern named {name!r}"
-            )
+            raise AttributeError(f"{self._entity.__name__!r} has no access pattern named {name!r}")
         key_def = keys[name]
 
         def builder(**pk_attrs: Any) -> QueryBuilder[E]:
             return QueryBuilder(self._entity, key_def, pk_attrs)
 
         return builder
+
+
+class ScanBuilder(Generic[E]):
+    """Fluent builder for a full-table scan restricted to one entity type."""
+
+    def __init__(self, entity_cls: type[E]) -> None:
+        self._entity = entity_cls
+        self._filter: Condition | None = None
+        self._limit: int | None = None
+        self._projection: list[str] | None = None
+
+    def filter(self, condition: Condition) -> ScanBuilder[E]:
+        self._filter = condition if self._filter is None else (self._filter & condition)
+        return self
+
+    def limit(self, count: int) -> ScanBuilder[E]:
+        self._limit = count
+        return self
+
+    def attributes(self, names: list[str]) -> ScanBuilder[E]:
+        """Project only ``names``; omitted fields fall back to model defaults."""
+        self._projection = names
+        return self
+
+    def _build_params(self) -> dict[str, Any]:
+        from .entity import ENTITY_ATTR
+
+        context = ExpressionContext()
+        # Restrict the scan to this entity via the discriminator marker.
+        discriminator: Condition = F(ENTITY_ATTR) == self._entity.__entity_name__
+        full_filter = discriminator if self._filter is None else (discriminator & self._filter)
+        params: dict[str, Any] = {
+            "TableName": self._entity.__entity_table__.name,
+            "FilterExpression": full_filter.compile(context),
+        }
+        if self._projection:
+            params["ProjectionExpression"] = ", ".join(context.name(a) for a in self._projection)
+        params["ExpressionAttributeNames"] = context.names
+        params["ExpressionAttributeValues"] = context.values
+        return params
+
+    def iter(self) -> Iterator[E]:
+        """Lazily iterate matching items, paginating transparently."""
+        client = self._entity.__entity_table__.client
+        params = self._build_params()
+        remaining = self._limit
+        start_key: dict[str, Any] | None = None
+        while True:
+            page_params = dict(params)
+            if remaining is not None:
+                page_params["Limit"] = remaining
+            if start_key is not None:
+                page_params["ExclusiveStartKey"] = start_key
+            response = client.scan(**page_params)
+            for raw in response.get("Items", []):
+                yield self._entity.from_dynamo(raw)
+                if remaining is not None:
+                    remaining -= 1
+                    if remaining <= 0:
+                        return
+            start_key = response.get("LastEvaluatedKey")
+            if not start_key:
+                return
+
+    def all(self) -> list[E]:
+        """Return every matching item as a list."""
+        return list(self.iter())
+
+    def first(self) -> E | None:
+        """Return the first matching item, or ``None``."""
+        for item in self.iter():
+            return item
+        return None
+
+    def page(self, cursor: str | None = None) -> Page[E]:
+        """Return a single page of results plus an opaque next-page cursor."""
+        client = self._entity.__entity_table__.client
+        params = self._build_params()
+        if self._limit is not None:
+            params["Limit"] = self._limit
+        start_key = decode_cursor(cursor)
+        if start_key is not None:
+            params["ExclusiveStartKey"] = start_key
+        response = client.scan(**params)
+        items = [self._entity.from_dynamo(raw) for raw in response.get("Items", [])]
+        return Page(items=items, cursor=encode_cursor(response.get("LastEvaluatedKey")))
+
+    def count(self) -> int:
+        """Count matching items server-side without materialising them."""
+        client = self._entity.__entity_table__.client
+        params = self._build_params()
+        params["Select"] = "COUNT"
+        params.pop("ProjectionExpression", None)
+        total = 0
+        start_key: dict[str, Any] | None = None
+        while True:
+            page_params = dict(params)
+            if start_key is not None:
+                page_params["ExclusiveStartKey"] = start_key
+            response = client.scan(**page_params)
+            total += int(response.get("Count", 0))
+            start_key = response.get("LastEvaluatedKey")
+            if not start_key:
+                return total

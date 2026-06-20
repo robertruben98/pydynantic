@@ -91,7 +91,23 @@ users = (User.query.primary(org_id="acme")
 user = User.query.by_email(email="a@x.com").one_or_none()  # -> User | None
 
 # Sort-key operators: .eq .begins_with .between .gt .gte .lt .lte
-# Terminals: .all() .one() .one_or_none() .first() .iter() .page(cursor=...)
+# Terminals: .all() .one() .one_or_none() .first() .iter() .page(cursor=...) .count()
+
+# Count server-side (no items materialised):
+active = User.query.primary(org_id="acme").filter(F("status") == "active").count()
+
+# Projection — fetch only some attributes (omitted ones fall back to defaults):
+User.query.primary(org_id="acme").attributes(["user_id", "name"]).all()
+User.get(org_id="acme", user_id="u1", attributes=["user_id", "name"])
+```
+
+### Scan
+
+```python
+# Full-table scan, automatically restricted to this entity's items:
+all_users = User.scan().all()
+User.scan().filter(F("status") == "active").count()
+# Same builder surface as query: .filter .limit .attributes .all .first .iter .page .count
 ```
 
 ### Filters & conditions

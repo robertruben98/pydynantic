@@ -44,6 +44,10 @@ def test_stale_write_raises_optimistic_lock(models: object) -> None:
     with pytest.raises(OptimisticLockError):
         Order.put(client_b)
 
+    # The failed write must not leave B's in-memory version bumped, so a fresh
+    # read + retry can still succeed.
+    assert client_b.version == 1
+
 
 def test_update_increments_version(models: object) -> None:
     Order = models.Order  # type: ignore[attr-defined]

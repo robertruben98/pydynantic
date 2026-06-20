@@ -16,8 +16,7 @@ def seed(models: object, n: int) -> None:
 def test_batch_write_and_get(models: object) -> None:
     User = models.User  # type: ignore[attr-defined]
     users = [
-        User(user_id=f"u{i}", org_id="acme", email=f"u{i}@x.com", name=f"N{i}")
-        for i in range(5)
+        User(user_id=f"u{i}", org_id="acme", email=f"u{i}@x.com", name=f"N{i}") for i in range(5)
     ]
     User.batch_write(puts=users)
 
@@ -35,8 +34,7 @@ def test_batch_write_chunks_over_25(models: object) -> None:
 def test_batch_get_chunks_over_100(models: object) -> None:
     User = models.User  # type: ignore[attr-defined]
     users = [
-        User(user_id=f"u{i}", org_id="acme", email=f"u{i}@x.com", name="N")
-        for i in range(150)
+        User(user_id=f"u{i}", org_id="acme", email=f"u{i}@x.com", name="N") for i in range(150)
     ]
     User.batch_write(puts=users)
     fetched = User.batch_get([("acme", f"u{i}") for i in range(150)])
@@ -54,6 +52,15 @@ def test_batch_write_deletes(models: object) -> None:
 def test_batch_get_accepts_dict_keys(models: object) -> None:
     seed(models, 2)
     fetched = models.User.batch_get([{"org_id": "acme", "user_id": "u1"}])  # type: ignore[attr-defined]
+    assert len(fetched) == 1
+
+
+def test_batch_get_dedupes_duplicate_keys(models: object) -> None:
+    # DynamoDB rejects duplicate keys in one BatchGetItem; we must dedupe first.
+    seed(models, 1)
+    fetched = models.User.batch_get(  # type: ignore[attr-defined]
+        [("acme", "u1"), ("acme", "u1"), {"org_id": "acme", "user_id": "u1"}]
+    )
     assert len(fetched) == 1
 
 

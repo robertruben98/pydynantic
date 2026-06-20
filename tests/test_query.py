@@ -129,3 +129,47 @@ def test_one_success_and_failure(models: object) -> None:
 def test_unknown_access_pattern_raises(models: object) -> None:
     with pytest.raises(AttributeError):
         models.User.query.nonexistent(org_id="acme")  # type: ignore[attr-defined]
+
+
+def test_query_count(models: object) -> None:
+    seed(models, 5)
+    q = models.User.query  # type: ignore[attr-defined]
+    assert q.primary(org_id="acme").count() == 5
+    assert q.primary(org_id="acme").filter(F("login_count") > 2).count() == 3
+    assert q.primary(org_id="ghost").count() == 0
+
+
+def test_query_projection(models: object) -> None:
+    seed(models, 1)
+    user = (
+        models.User.query.primary(org_id="acme")  # type: ignore[attr-defined]
+        .attributes(["user_id", "org_id", "email", "name"])
+        .one()
+    )
+    assert user.user_id == "u1"
+    assert user.login_count == 0  # not projected -> model default
+
+
+def test_scan_returns_only_this_entity(models: object) -> None:
+    seed(models, 3)
+    models.Membership.put(models.Membership(org_id="acme", user_id="u1"))  # type: ignore[attr-defined]
+    users = models.User.scan().all()  # type: ignore[attr-defined]
+    assert {u.user_id for u in users} == {"u1", "u2", "u3"}
+    assert all(isinstance(u, models.User) for u in users)  # type: ignore[attr-defined]
+
+
+def test_scan_filter_count_limit(models: object) -> None:
+    seed(models, 5)
+    assert models.User.scan().count() == 5  # type: ignore[attr-defined]
+    filtered = models.User.scan().filter(F("login_count") > 3).all()  # type: ignore[attr-defined]
+    assert {u.user_id for u in filtered} == {"u4", "u5"}
+    assert len(models.User.scan().limit(2).all()) == 2  # type: ignore[attr-defined]
+
+
+def test_scan_pagination(models: object) -> None:
+    seed(models, 5)
+    page = models.User.scan().limit(2).page()  # type: ignore[attr-defined]
+    assert len(page.items) == 2
+    assert page.cursor is not None
+    rest = models.User.scan().page(cursor=page.cursor)  # type: ignore[attr-defined]
+    assert len(rest.items) >= 1

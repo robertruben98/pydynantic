@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- `Entity.scan()` — full-table scan restricted to the entity via its
+  `__entity__` discriminator, with `filter`, `limit`, `attributes`, `all`,
+  `first`, `iter`, `page` and `count` (exported as `ScanBuilder`).
+- `QueryBuilder.count()` / `ScanBuilder.count()` — server-side `Select=COUNT`.
+- `QueryBuilder.attributes([...])` and `get(attributes=[...])` —
+  `ProjectionExpression` support to fetch only selected attributes.
+- CI job running the integration suite against `amazon/dynamodb-local`.
+
+### Fixed
+- `put()` on a versioned entity no longer leaves the in-memory `version`
+  incremented when the conditional write fails, so a retry after re-reading
+  works correctly.
+- `update()` now raises instead of silently leaving a GSI key stale when it
+  changes an attribute feeding that index but cannot recompute the full key
+  (missing source attributes); the error names the missing attributes.
+- `batch_get()` deduplicates keys before issuing the request, avoiding the
+  `ValidationException` DynamoDB raises for duplicate keys.
+
 ## [0.1.0] - 2026-06-19
 
 First public release.

@@ -35,13 +35,21 @@ def batch_get(entity_cls: type[E], keys: list[Any], *, consistent: bool = False)
 
     table = entity_cls.__entity_table__
     client = table.client
-    raw_keys = [entity_cls.build_key(entity_cls._coerce_key(k)) for k in keys]
+    # DynamoDB rejects a BatchGetItem with duplicate keys; dedupe while
+    # preserving first-seen order.
+    seen: set[str] = set()
+    raw_keys: list[dict[str, Any]] = []
+    for k in keys:
+        raw = entity_cls.build_key(entity_cls._coerce_key(k))
+        marker = repr(sorted(raw.items()))
+        if marker in seen:
+            continue
+        seen.add(marker)
+        raw_keys.append(raw)
     results: list[E] = []
 
     for chunk in _chunks(raw_keys, BATCH_GET_LIMIT):
-        request: dict[str, Any] = {
-            table.name: {"Keys": list(chunk), "ConsistentRead": consistent}
-        }
+        request: dict[str, Any] = {table.name: {"Keys": list(chunk), "ConsistentRead": consistent}}
         attempt = 0
         while request:
             try:
