@@ -5,7 +5,7 @@ from __future__ import annotations
 from pydantic import Field
 
 from .attributes import version_attr
-from .collections import Collection, CollectionResult
+from .collections import Collection, CollectionPage, CollectionResult
 from .entity import Entity
 from .errors import (
     ConditionCheckFailedError,
@@ -50,6 +50,7 @@ __all__ = [
     # Collections
     "Collection",
     "CollectionResult",
+    "CollectionPage",
     # Transactions
     "transaction",
     "Transaction",
