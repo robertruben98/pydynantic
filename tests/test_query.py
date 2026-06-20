@@ -173,3 +173,26 @@ def test_scan_pagination(models: object) -> None:
     assert page.cursor is not None
     rest = models.User.scan().page(cursor=page.cursor)  # type: ignore[attr-defined]
     assert len(rest.items) >= 1
+
+
+def test_query_consistent_on_primary(models: object) -> None:
+    seed(models, 3)
+    builder = models.User.query.primary(org_id="acme").consistent()  # type: ignore[attr-defined]
+    users = builder.all()
+    assert {u.user_id for u in users} == {"u1", "u2", "u3"}
+    assert builder._build_params()["ConsistentRead"] is True
+
+
+def test_query_consistent_default_absent(models: object) -> None:
+    builder = models.User.query.primary(org_id="acme")  # type: ignore[attr-defined]
+    assert "ConsistentRead" not in builder._build_params()
+
+
+def test_consistent_on_gsi_raises(models: object) -> None:
+    with pytest.raises(ValueError):
+        models.User.query.by_email(email="x@y.com").consistent()  # type: ignore[attr-defined]
+
+
+def test_consistent_false_on_gsi_allowed(models: object) -> None:
+    builder = models.User.query.by_email(email="x@y.com").consistent(False)  # type: ignore[attr-defined]
+    assert "ConsistentRead" not in builder._build_params()

@@ -33,6 +33,7 @@ class QueryBuilder(Generic[E]):
         self._limit: int | None = None
         self._forward = True
         self._projection: list[str] | None = None
+        self._consistent = False
 
     # -- sort key conditions ------------------------------------------------
     def _with_sk(self, operator: str, *args: Any) -> QueryBuilder[E]:
@@ -84,6 +85,17 @@ class QueryBuilder(Generic[E]):
         self._forward = False
         return self
 
+    def consistent(self, value: bool = True) -> QueryBuilder[E]:
+        """Request a strongly consistent read. Mirrors ``get(consistent=...)``.
+
+        GSIs only support eventually consistent reads, so requesting a
+        consistent read against an index is rejected eagerly.
+        """
+        if value and self._key.index is not None:
+            raise ValueError(f"Index {self._key.index!r} (GSI) does not support consistent reads")
+        self._consistent = value
+        return self
+
     # -- request building ---------------------------------------------------
     def _key_condition(self, context: ExpressionContext) -> str:
         pk_name = context.name(self._key.pk_attr)
@@ -108,6 +120,8 @@ class QueryBuilder(Generic[E]):
         }
         if self._key.index is not None:
             params["IndexName"] = self._key.index
+        if self._consistent:
+            params["ConsistentRead"] = True
         if self._filter is not None:
             params["FilterExpression"] = self._filter.compile(context)
         if self._projection:
