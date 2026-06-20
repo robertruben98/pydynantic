@@ -67,15 +67,15 @@ Harden the data path against the parts of DynamoDB that bite.
 
 Make "it works" provable and keep it that way.
 
-- [ ] **Coverage to ~100%** — close the remaining branches in `batch.py`
-      (backoff/retry), `entity.py`, `keys.py`, `table.py`.
-- [ ] **Integration parity** — the CI integration job (DynamoDB Local) should
+- [x] **Coverage to ~100%** — close the remaining branches in `batch.py`
+      (backoff/retry), `entity.py`, `keys.py`, `table.py`. _(now 99%)_
+- [x] **Integration parity** — the CI integration job (DynamoDB Local) should
       exercise the same matrix the moto unit tests do, not just a smoke test.
-- [ ] **Property-based tests** — `hypothesis` for marshalling round-trips and
+- [x] **Property-based tests** — `hypothesis` for marshalling round-trips and
       key template render/parse symmetry.
-- [ ] **Benchmarks** — a small, tracked suite (marshalling throughput, query
+- [x] **Benchmarks** — a small, tracked suite (marshalling throughput, query
       pagination overhead) to catch regressions before they ship.
-- [ ] **Tooling** — `pre-commit` config, Dependabot, Codecov (or coverage gate
+- [x] **Tooling** — `pre-commit` config, Dependabot, Codecov (or coverage gate
       bump), and an automated **GitHub Release** step in the release workflow
       (today it publishes to PyPI but does not create the GH release).
 

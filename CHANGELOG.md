@@ -31,6 +31,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   changelog) on tag pushes, in addition to publishing to PyPI.
 - Added a `pre-commit` config (ruff lint + format, hygiene hooks) and Dependabot
   (weekly `github-actions` + `pip` updates).
+- CI now runs the integration suite (DynamoDB Local) across the full Python
+  matrix (3.10–3.13), and uploads coverage to Codecov.
 - Pagination cursors are now versioned and strictly validated: a tampered,
   stale, or hand-built cursor raises `PydynanticError` instead of mis-paginating
   or leaking a raw decode error; cursors are padding-free base64url.
@@ -41,13 +43,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 - Marshalling hardening: mixed-type sets are rejected early with a clear
   `PydynanticError` (instead of a cryptic boto3 error); numbers exceeding
-  DynamoDB's 38-digit / ±10^125 limits raise a friendly error; empty strings are
-  retained and round-trip (only `None` and empty sets are dropped).
+  DynamoDB's precision/range (38 digits, exponent ~±10^125, and the lower
+  `~10^-130` underflow/subnormal bound) raise a friendly error; empty strings
+  are retained and round-trip (only `None` and empty sets are dropped).
 
 ### Tests
-- Property-based (Hypothesis) fuzzing of the expression builder: placeholder
-  dedup, token round-trip, dotted paths, reserved words, and namespace
-  disjointness across generated attribute names and conditions.
+- Property-based (Hypothesis) fuzzing of the expression builder (placeholder
+  dedup, token round-trip, dotted paths, reserved words, namespace
+  disjointness) and of marshalling round-trips + key-template render/parse
+  symmetry.
+- Test coverage raised to ~99% (batch retry/backoff, error mapping, default
+  client construction, pagination loops, collection discrimination).
+- A standalone `benchmarks/` suite (pytest-benchmark) for marshalling throughput
+  and query/pagination overhead, runnable outside the CI gate.
 
 ## [0.2.0] - 2026-06-20
 
