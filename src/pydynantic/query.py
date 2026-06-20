@@ -166,9 +166,39 @@ class QueryBuilder(Generic[E]):
             return item
         return None
 
+    def _fetch_two(self) -> list[E]:
+        """Fetch up to two matching items, ignoring any user ``.limit()``.
+
+        Mirrors :meth:`iter`'s pagination loop with an effective ``Limit`` of 2
+        so multiplicity can always be detected, without mutating ``self._limit``.
+        """
+        client = self._entity.__entity_table__.client
+        params = self._build_params()
+        remaining = 2
+        results: list[E] = []
+        start_key: dict[str, Any] | None = None
+        while True:
+            page_params = dict(params)
+            page_params["Limit"] = remaining
+            if start_key is not None:
+                page_params["ExclusiveStartKey"] = start_key
+            response = client.query(**page_params)
+            for raw in response.get("Items", []):
+                results.append(self._entity.from_dynamo(raw))
+                remaining -= 1
+                if remaining <= 0:
+                    return results
+            start_key = response.get("LastEvaluatedKey")
+            if not start_key:
+                return results
+
     def one_or_none(self) -> E | None:
-        """Return the single match, ``None`` if none, error if more than one."""
-        results = self.limit(2).all() if self._limit is None else self.all()
+        """Return the single match, ``None`` if none, error if more than one.
+
+        Any user ``.limit()`` is ignored: this always probes for a second item
+        so the "multiple results" case is never silently masked.
+        """
+        results = self._fetch_two()
         if not results:
             return None
         if len(results) > 1:
@@ -176,7 +206,11 @@ class QueryBuilder(Generic[E]):
         return results[0]
 
     def one(self) -> E:
-        """Return the single match, raising if zero or more than one."""
+        """Return the single match, raising if zero or more than one.
+
+        Any user ``.limit()`` is ignored: this always probes for a second item
+        so the "multiple results" case is never silently masked.
+        """
         result = self.one_or_none()
         if result is None:
             raise ItemNotFoundError("Expected exactly one item, found none")
