@@ -22,6 +22,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `ttl_attr()` — mark a `datetime`/`int` field as a DynamoDB TTL attribute;
   it is stored as a Unix-epoch-seconds Number and round-trips back to the
   declared type (no manual conversion).
+- `created_at_attr()` / `updated_at_attr()` — opt-in auto-timestamps; `put`
+  stamps `created_at` once and `updated_at` every write, `update` refreshes
+  `updated_at` (unless set explicitly), with in-memory rollback on a failed put.
 
 ### Changed
 - Release workflow now also creates a GitHub Release (notes sliced from this
