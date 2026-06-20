@@ -2,10 +2,18 @@
 
 from __future__ import annotations
 
-import pytest
+from typing import Any
 
-from pydynantic import Entity, F, attr_not_exists, key
-from pydynantic.errors import ConditionCheckFailedError, ItemNotFoundError, PydynanticError
+import pytest
+from botocore.exceptions import ClientError
+
+from pydynantic import Entity, F, attr_exists, attr_not_exists, key
+from pydynantic.errors import (
+    ConditionCheckFailedError,
+    ItemNotFoundError,
+    PydynanticError,
+    ValidationError,
+)
 
 
 def make_user(models: object, **overrides: object) -> object:
@@ -182,3 +190,122 @@ def test_update_raises_when_gsi_cannot_be_recomputed(models: object) -> None:
     Doc.update(org_id="acme", doc_id="d1", set={"status": "closed", "category": "legal"})
     got = Doc.query.by_cat(category="legal").begins_with("ST#closed").all()
     assert len(got) == 1
+
+
+def test_put_generic_client_error_maps_to_pydynantic(models: object, monkeypatch: Any) -> None:
+    """A non-conditional ClientError surfaces as a plain PydynanticError."""
+    User = models.User  # type: ignore[attr-defined]
+    client = models.table.client  # type: ignore[attr-defined]
+
+    def boom(**kwargs: Any) -> Any:
+        raise ClientError(
+            {"Error": {"Code": "ResourceNotFoundException", "Message": "no table"}},
+            "PutItem",
+        )
+
+    monkeypatch.setattr(client, "put_item", boom)
+    with pytest.raises(PydynanticError):
+        User.put(make_user(models))
+
+
+def test_from_dynamo_invalid_item_raises_validation_error(models: object) -> None:
+    """A raw item missing a required field fails Pydantic validation."""
+    User = models.User  # type: ignore[attr-defined]
+    # Required ``email``/``name`` are absent from the raw item.
+    raw = {"user_id": {"S": "u1"}, "org_id": {"S": "acme"}}
+    with pytest.raises(ValidationError):
+        User.from_dynamo(raw)
+
+
+def test_coerce_key_rejects_scalar(models: object) -> None:
+    User = models.User  # type: ignore[attr-defined]
+    with pytest.raises(TypeError):
+        User._coerce_key(123)
+
+
+def test_get_with_projection_builds_entity(models: object) -> None:
+    User = models.User  # type: ignore[attr-defined]
+    User.put(make_user(models, login_count=9))
+    fetched = User.get(
+        org_id="acme",
+        user_id="u1",
+        attributes=["user_id", "org_id", "email", "name"],
+    )
+    assert fetched is not None
+    assert fetched.user_id == "u1"
+    # login_count projected away -> model default.
+    assert fetched.login_count == 0
+
+
+def test_get_or_raise_missing_raises(models: object) -> None:
+    User = models.User  # type: ignore[attr-defined]
+    with pytest.raises(ItemNotFoundError):
+        User.get_or_raise(org_id="acme", user_id="ghost")
+
+
+def test_get_or_raise_returns_existing(models: object) -> None:
+    User = models.User  # type: ignore[attr-defined]
+    User.put(make_user(models))
+    fetched = User.get_or_raise(org_id="acme", user_id="u1")
+    assert fetched.user_id == "u1"
+
+
+def test_delete_with_valueless_condition(models: object) -> None:
+    """A condition with no expression values still deletes (covers no-values branch)."""
+    User = models.User  # type: ignore[attr-defined]
+    User.put(make_user(models, name="Ana"))
+    old = User.delete(
+        org_id="acme",
+        user_id="u1",
+        condition=attr_exists("name"),
+        return_values="ALL_OLD",
+    )
+    assert old is not None
+
+
+def test_delete_with_condition_returns_old_item(models: object) -> None:
+    User = models.User  # type: ignore[attr-defined]
+    User.put(make_user(models, name="Ana"))
+    old = User.delete(
+        org_id="acme",
+        user_id="u1",
+        condition=F("name") == "Ana",
+        return_values="ALL_OLD",
+    )
+    assert old is not None
+    assert old.name == "Ana"
+
+
+def test_update_delete_clause_removes_set_element(models: object) -> None:
+    User = models.User  # type: ignore[attr-defined]
+    User.put(make_user(models, tags={"x", "y"}))
+    updated = User.update(org_id="acme", user_id="u1", delete={"tags": {"x"}})
+    assert updated is not None
+    assert updated.tags == {"y"}
+
+
+def test_update_return_values_none(models: object) -> None:
+    User = models.User  # type: ignore[attr-defined]
+    User.put(make_user(models))
+    result = User.update(
+        org_id="acme",
+        user_id="u1",
+        set={"name": "Z"},
+        return_values="NONE",
+    )
+    assert result is None
+    assert User.get(org_id="acme", user_id="u1").name == "Z"  # type: ignore[union-attr]
+
+
+def test_build_key_sk_less_primary(models: object) -> None:
+    """An entity whose primary key has no sort key builds a pk-only key."""
+    table = models.table  # type: ignore[attr-defined]
+
+    class Counter(Entity, table=table, name="counter_nosk"):
+        counter_id: str
+
+        class Meta:
+            primary = key(pk="COUNTER#{counter_id}")
+
+    built = Counter.build_key({"counter_id": "c1"})
+    assert built == {"PK": {"S": "COUNTER#c1"}}

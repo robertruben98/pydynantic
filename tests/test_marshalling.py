@@ -190,6 +190,21 @@ def test_normal_numbers_unaffected() -> None:
     assert serialize(10**30) == {"N": "1" + "0" * 30}
 
 
+def test_set_family_fallback_names_unknown_type() -> None:
+    """A set element of an unrecognised family makes the error name its type."""
+    with pytest.raises(PydynanticError) as excinfo:
+        # None is prepared as-is and falls into _set_family's fallback branch,
+        # making the set heterogeneous against the string element.
+        serialize({None, "a"})
+    assert "NoneType" in str(excinfo.value)
+
+
+def test_prepare_empty_set_returns_empty_set() -> None:
+    from pydynantic.marshalling import _prepare
+
+    assert _prepare(set()) == set()
+
+
 def test_full_entity_type_roundtrip(models: object) -> None:
     """Every supported type survives a put/get cycle through DynamoDB."""
     User = models.User  # type: ignore[attr-defined]
