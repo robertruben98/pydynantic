@@ -1,0 +1,5983 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Single-table design for DynamoDB in Python, with typed entities on top of Pydantic v2.">
+      
+      
+      
+      
+        <link rel="prev" href="../../migrating/from-dynamodb-toolbox/">
+      
+      
+        <link rel="next" href="../../policies/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+    
+    
+      
+        <title>API reference - pydynantic</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/_mkdocstrings.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#api-reference" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="pydynantic" class="md-header__button md-logo" aria-label="pydynantic" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            pydynantic
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              API reference
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/robertruben98/pydynantic" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    robertruben98/pydynantic
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../.." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../concepts/single-table-design/" class="md-tabs__link">
+          
+  
+  
+  Concepts
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../guide/entities-and-keys/" class="md-tabs__link">
+          
+  
+  
+  Guide
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href="../../recipes/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Recipes
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../migrating/from-electrodb/" class="md-tabs__link">
+          
+  
+  
+  Migrating
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
+        
+  
+  
+    
+  
+  API reference
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../policies/" class="md-tabs__link">
+          
+  
+  
+  Project
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="pydynantic" class="md-nav__button md-logo" aria-label="pydynantic" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    pydynantic
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/robertruben98/pydynantic" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    robertruben98/pydynantic
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Concepts
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Concepts
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../concepts/single-table-design/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Single-table design
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Guide
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Guide
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/entities-and-keys/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Entities & keys
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/crud/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    CRUD
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/queries/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Queries
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/filters-and-conditions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Filters & conditions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/pagination/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pagination
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/batch/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Batch
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/transactions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Transactions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/collections/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Collections
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/optimistic-locking/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Optimistic locking
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/ttl-and-timestamps/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    TTL & timestamps
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/marshalling/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Marshalling
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../recipes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Recipes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Migrating
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Migrating
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../migrating/from-electrodb/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    From ElectroDB
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../migrating/from-dynamodb-toolbox/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    From DynamoDB-Toolbox
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API reference
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#pydynantic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        pydynantic
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="pydynantic">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.OperationHook" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OperationHook
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.Collection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Collection
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Collection">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.Collection.query" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        query
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.CollectionPage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CollectionPage
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="CollectionPage">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.CollectionPage.has_more" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        has_more
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.CollectionResult" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CollectionResult
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="CollectionResult">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.CollectionResult.all" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        all
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.Entity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Entity
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Entity">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.Entity.to_dynamo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        to_dynamo
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.Entity.from_dynamo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        from_dynamo
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.Entity.build_key" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        build_key
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.Entity.put" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        put
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.Entity.get" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.Entity.get_or_raise" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_or_raise
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.Entity.delete" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        delete
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.Entity.update" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        update
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.Entity.batch_get" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        batch_get
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.Entity.batch_write" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        batch_write
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.Entity.scan" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        scan
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.ConditionCheckFailedError" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ConditionCheckFailedError
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.ItemNotFoundError" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ItemNotFoundError
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.KeyTemplateError" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        KeyTemplateError
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.MultipleResultsError" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MultipleResultsError
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.OptimisticLockError" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OptimisticLockError
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.PydynanticError" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PydynanticError
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.TransactionCanceledError" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TransactionCanceledError
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.ValidationError" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ValidationError
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.Condition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Condition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.F" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        F
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.KeyDefinition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        KeyDefinition
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="KeyDefinition">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.KeyDefinition.referenced_fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        referenced_fields
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.KeyDefinition.bind" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        bind
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.KeyDefinition.build_pk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        build_pk
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.KeyDefinition.build_sk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        build_sk
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.KeyDefinition.key_attributes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        key_attributes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.OperationEvent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OperationEvent
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.Page" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Page
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Page">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.Page.has_more" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        has_more
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.QueryBuilder" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        QueryBuilder
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="QueryBuilder">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.QueryBuilder.eq" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        eq
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.QueryBuilder.lt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        lt
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.QueryBuilder.lte" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        lte
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.QueryBuilder.gt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        gt
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.QueryBuilder.gte" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        gte
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.QueryBuilder.begins_with" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        begins_with
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.QueryBuilder.between" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        between
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.QueryBuilder.filter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        filter
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.QueryBuilder.limit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        limit
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.QueryBuilder.attributes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        attributes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.QueryBuilder.ascending" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ascending
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.QueryBuilder.descending" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        descending
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.QueryBuilder.consistent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        consistent
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.QueryBuilder.iter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        iter
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.QueryBuilder.all" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        all
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.QueryBuilder.first" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        first
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.QueryBuilder.one_or_none" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        one_or_none
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.QueryBuilder.one" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        one
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.QueryBuilder.page" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        page
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.QueryBuilder.count" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        count
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.QueryNamespace" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        QueryNamespace
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.ScanBuilder" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ScanBuilder
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ScanBuilder">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.ScanBuilder.filter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        filter
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.ScanBuilder.limit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        limit
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.ScanBuilder.attributes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        attributes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.ScanBuilder.iter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        iter
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.ScanBuilder.all" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        all
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.ScanBuilder.first" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        first
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.ScanBuilder.page" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        page
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.ScanBuilder.count" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        count
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.Index" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Index
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.Table" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Table
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Table">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.Table.register" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        register
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.Table.entity_for" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        entity_for
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.Transaction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Transaction
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Transaction">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.Transaction.put" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        put
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.Transaction.delete" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        delete
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.Transaction.condition_check" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        condition_check
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.Transaction.update" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        update
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.Transaction.commit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        commit
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.created_at_attr" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        created_at_attr
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.ttl_attr" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ttl_attr
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.updated_at_attr" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        updated_at_attr
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.version_attr" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        version_attr
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.attr_exists" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        attr_exists
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.attr_not_exists" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        attr_not_exists
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.key" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        key
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.decode_cursor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        decode_cursor
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.encode_cursor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        encode_cursor
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.transaction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        transaction
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#re-exported-from-pydantic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Re-exported from Pydantic
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pydantic.Field" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Field
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_7" id="__nav_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Project
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_7">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Project
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../policies/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Policies
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#pydynantic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        pydynantic
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="pydynantic">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.OperationHook" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OperationHook
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.Collection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Collection
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Collection">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.Collection.query" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        query
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.CollectionPage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CollectionPage
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="CollectionPage">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.CollectionPage.has_more" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        has_more
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.CollectionResult" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CollectionResult
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="CollectionResult">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.CollectionResult.all" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        all
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.Entity" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Entity
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Entity">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.Entity.to_dynamo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        to_dynamo
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.Entity.from_dynamo" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        from_dynamo
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.Entity.build_key" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        build_key
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.Entity.put" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        put
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.Entity.get" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.Entity.get_or_raise" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        get_or_raise
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.Entity.delete" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        delete
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.Entity.update" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        update
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.Entity.batch_get" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        batch_get
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.Entity.batch_write" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        batch_write
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.Entity.scan" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        scan
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.ConditionCheckFailedError" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ConditionCheckFailedError
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.ItemNotFoundError" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ItemNotFoundError
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.KeyTemplateError" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        KeyTemplateError
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.MultipleResultsError" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MultipleResultsError
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.OptimisticLockError" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OptimisticLockError
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.PydynanticError" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        PydynanticError
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.TransactionCanceledError" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TransactionCanceledError
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.ValidationError" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ValidationError
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.Condition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Condition
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.F" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        F
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.KeyDefinition" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        KeyDefinition
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="KeyDefinition">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.KeyDefinition.referenced_fields" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        referenced_fields
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.KeyDefinition.bind" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        bind
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.KeyDefinition.build_pk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        build_pk
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.KeyDefinition.build_sk" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        build_sk
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.KeyDefinition.key_attributes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        key_attributes
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.OperationEvent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        OperationEvent
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.Page" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Page
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Page">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.Page.has_more" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        has_more
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.QueryBuilder" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        QueryBuilder
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="QueryBuilder">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.QueryBuilder.eq" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        eq
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.QueryBuilder.lt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        lt
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.QueryBuilder.lte" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        lte
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.QueryBuilder.gt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        gt
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.QueryBuilder.gte" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        gte
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.QueryBuilder.begins_with" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        begins_with
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.QueryBuilder.between" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        between
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.QueryBuilder.filter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        filter
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.QueryBuilder.limit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        limit
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.QueryBuilder.attributes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        attributes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.QueryBuilder.ascending" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ascending
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.QueryBuilder.descending" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        descending
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.QueryBuilder.consistent" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        consistent
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.QueryBuilder.iter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        iter
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.QueryBuilder.all" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        all
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.QueryBuilder.first" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        first
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.QueryBuilder.one_or_none" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        one_or_none
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.QueryBuilder.one" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        one
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.QueryBuilder.page" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        page
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.QueryBuilder.count" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        count
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.QueryNamespace" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        QueryNamespace
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.ScanBuilder" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ScanBuilder
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="ScanBuilder">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.ScanBuilder.filter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        filter
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.ScanBuilder.limit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        limit
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.ScanBuilder.attributes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        attributes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.ScanBuilder.iter" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        iter
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.ScanBuilder.all" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        all
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.ScanBuilder.first" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        first
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.ScanBuilder.page" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        page
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.ScanBuilder.count" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        count
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.Index" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Index
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.Table" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Table
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Table">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.Table.register" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        register
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.Table.entity_for" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        entity_for
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.Transaction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Transaction
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Transaction">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.Transaction.put" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        put
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.Transaction.delete" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        delete
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.Transaction.condition_check" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        condition_check
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.Transaction.update" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        update
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.Transaction.commit" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        commit
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.created_at_attr" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        created_at_attr
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.ttl_attr" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ttl_attr
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.updated_at_attr" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        updated_at_attr
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.version_attr" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        version_attr
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.attr_exists" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        attr_exists
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.attr_not_exists" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        attr_not_exists
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.key" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        key
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.decode_cursor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        decode_cursor
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.encode_cursor" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        encode_cursor
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#pydynantic.transaction" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        transaction
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#re-exported-from-pydantic" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Re-exported from Pydantic
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pydantic.Field" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Field
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="api-reference">API reference<a class="headerlink" href="#api-reference" title="Permanent link">&para;</a></h1>
+<p>Everything exported from the <code>pydynantic</code> top-level package. Each symbol below is
+generated directly from its docstring and signature.</p>
+
+
+<div class="doc doc-object doc-module">
+
+
+
+<h2 id="pydynantic" class="doc doc-heading">
+            <span class="doc doc-object-name doc-module-name">pydynantic</span>
+
+
+<a href="#pydynantic" class="headerlink" title="Permanent link">&para;</a></h2>
+
+    <div class="doc doc-contents first">
+
+        <p>pydynantic: single-table design for DynamoDB, with typed Pydantic entities.</p>
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h3 id="pydynantic.OperationHook" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">OperationHook</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-module-attribute"><code>module-attribute</code></small>
+  </span>
+
+<a href="#pydynantic.OperationHook" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">OperationHook</span> <span class="o">=</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">OperationEvent</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>A callable invoked once per DynamoDB operation; receives an :class:<code>OperationEvent</code>.</p>
+
+    </div>
+
+</div>
+
+
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="pydynantic.Collection" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">Collection</span>
+
+
+<a href="#pydynantic.Collection" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>Base class for a set of entities sharing a partition.</p>
+<p>Declare <code>members = [User, Membership, Invoice]</code> on the subclass; all
+members must compose the same partition key. Query a partition with
+<code>OrgData.query(org_id="acme").all()</code> and read results as <code>result.users</code>,
+<code>result.invoices</code> (the entity name pluralised).</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="pydynantic.Collection.query" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">query</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+<a href="#pydynantic.Collection.query" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">query</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">attributes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">pk_attrs</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Query a partition for all member entity types.</p>
+<p><code>attributes</code> limits the response to a projection of attribute paths;
+omitted fields fall back to their model defaults (or fail validation if
+required), so include everything each member needs to construct. The
+discriminator attribute is always included so bucketing still works.</p>
+
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="pydynantic.CollectionPage" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">CollectionPage</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+<a href="#pydynantic.CollectionPage" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>A single page of a collection query plus a cursor for the next page.</p>
+<p><code>result</code> is a :class:<code>CollectionResult</code> bucketing the page's items by
+entity type; <code>cursor</code> is an opaque next-page token (<code>None</code> when the
+partition is drained).</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="pydynantic.CollectionPage.has_more" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">has_more</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+<a href="#pydynantic.CollectionPage.has_more" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">has_more</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Whether another page is available (a cursor was returned).</p>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="pydynantic.CollectionResult" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">CollectionResult</span>
+
+
+<a href="#pydynantic.CollectionResult" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>Holds the items of a collection query, bucketed per entity type.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="pydynantic.CollectionResult.all" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">all</span>
+
+
+<a href="#pydynantic.CollectionResult.all" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">all</span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Every item across all buckets, in DynamoDB return order.</p>
+
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="pydynantic.Entity" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">Entity</span>
+
+
+<a href="#pydynantic.Entity" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="pydantic.BaseModel">BaseModel</span></code></p>
+
+
+
+        <p>Base class for single-table entities.</p>
+<p>Subclass with <code>class User(Entity, table=table, name="user"): ...</code> and
+declare key templates on an inner <code>Meta</code> class via :func:<code>pydynantic.key</code>.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="pydynantic.Entity.to_dynamo" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">to_dynamo</span>
+
+
+<a href="#pydynantic.Entity.to_dynamo" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">to_dynamo</span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Build the full DynamoDB item (attributes + composed keys + marker).</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="pydynantic.Entity.from_dynamo" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">from_dynamo</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+<a href="#pydynantic.Entity.from_dynamo" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">from_dynamo</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Deserialize a raw DynamoDB item into an entity instance.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="pydynantic.Entity.build_key" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">build_key</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+<a href="#pydynantic.Entity.build_key" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">build_key</span><span class="p">(</span><span class="n">attrs</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Build the primary-key portion of an item from attribute values.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="pydynantic.Entity.put" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">put</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+<a href="#pydynantic.Entity.put" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">put</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">condition</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">return_values</span><span class="o">=</span><span class="s1">&#39;NONE&#39;</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Create or replace an item. Supports optimistic locking and conditions.</p>
+<p><code>put</code> always returns the <strong>written</strong> item (the object you passed in),
+so <code>put(x) is x</code>. <code>return_values="ALL_OLD"</code> asks DynamoDB to surface
+the pre-write stored state at the API level, but <code>put</code>'s return value
+is unchanged — and with optimistic locking the returned object carries
+the bumped version. Only <code>NONE</code> and <code>ALL_OLD</code> are valid.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="pydynantic.Entity.get" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">get</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+<a href="#pydynantic.Entity.get" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">get</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">consistent</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">attributes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">key_attrs</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Fetch an item by its primary key, or <code>None</code> if it does not exist.</p>
+<p><code>attributes</code> limits the response to a projection of attribute paths;
+omitted fields fall back to their model defaults (or fail validation if
+required), so include everything the entity needs to construct.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="pydynantic.Entity.get_or_raise" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">get_or_raise</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+<a href="#pydynantic.Entity.get_or_raise" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">get_or_raise</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">consistent</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">attributes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">key_attrs</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Like :meth:<code>get</code> but raises :class:<code>ItemNotFoundError</code> when missing.</p>
+<p>Accepts the same <code>consistent</code> and <code>attributes</code> read options as
+:meth:<code>get</code>.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="pydynantic.Entity.delete" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">delete</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+<a href="#pydynantic.Entity.delete" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">delete</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">condition</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">return_values</span><span class="o">=</span><span class="s1">&#39;NONE&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">key_attrs</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Delete an item by its primary key.</p>
+<p>With <code>return_values="ALL_OLD"</code> the deleted item is returned (or
+<code>None</code> if it did not exist); otherwise <code>delete</code> returns <code>None</code>.
+Only <code>NONE</code> and <code>ALL_OLD</code> are valid.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="pydynantic.Entity.update" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">update</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+<a href="#pydynantic.Entity.update" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">update</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="nb">set</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">remove</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">add</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">delete</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">condition</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">expected_version</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">return_values</span><span class="o">=</span><span class="s1">&#39;ALL_NEW&#39;</span><span class="p">,</span> <span class="o">**</span><span class="n">key_attrs</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Apply a partial update via a generated <code>UpdateExpression</code>.</p>
+<p><code>set</code> assigns attributes, <code>remove</code> deletes them, <code>add</code> performs
+atomic numeric/set additions, <code>delete</code> removes elements from sets.
+Any GSI key whose source attributes change is recomputed automatically.</p>
+<p>On a versioned entity, pass <code>expected_version</code> to guard the write with
+the version you last read: a concurrent change raises
+:class:<code>~pydynantic.OptimisticLockError</code> instead of silently overwriting
+it. The stored <code>version</code> is always incremented regardless.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="pydynantic.Entity.batch_get" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">batch_get</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+<a href="#pydynantic.Entity.batch_get" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">batch_get</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">consistent</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">attributes</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Fetch many items by key, chunking and retrying transparently.</p>
+<p><code>attributes</code> limits the response to a projection of attribute paths;
+omitted fields fall back to their model defaults (or fail validation if
+required), so include everything the entity needs to construct.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="pydynantic.Entity.batch_write" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">batch_write</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+<a href="#pydynantic.Entity.batch_write" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">batch_write</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">puts</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">deletes</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Write/delete many items, chunking and retrying unprocessed items.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="pydynantic.Entity.scan" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">scan</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-classmethod"><code>classmethod</code></small>
+  </span>
+
+<a href="#pydynantic.Entity.scan" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">scan</span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Return a builder for a full-table scan restricted to this entity.</p>
+<p>A scan reads the whole table; the builder automatically filters on the
+<code>__entity__</code> discriminator so only this entity's items are returned.
+Prefer :attr:<code>query</code> whenever a key condition applies.</p>
+
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="pydynantic.ConditionCheckFailedError" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">ConditionCheckFailedError</span>
+
+
+<a href="#pydynantic.ConditionCheckFailedError" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="PydynanticError (pydynantic.errors.PydynanticError)" href="#pydynantic.PydynanticError">PydynanticError</a></code></p>
+
+
+
+        <p>Raised when a write fails because its condition expression was not met.</p>
+
+
+
+
+
+
+
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="pydynantic.ItemNotFoundError" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">ItemNotFoundError</span>
+
+
+<a href="#pydynantic.ItemNotFoundError" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="PydynanticError (pydynantic.errors.PydynanticError)" href="#pydynantic.PydynanticError">PydynanticError</a></code></p>
+
+
+
+        <p>Raised when a required item does not exist (e.g. <code>get</code>/<code>one</code>).</p>
+
+
+
+
+
+
+
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="pydynantic.KeyTemplateError" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">KeyTemplateError</span>
+
+
+<a href="#pydynantic.KeyTemplateError" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="PydynanticError (pydynantic.errors.PydynanticError)" href="#pydynantic.PydynanticError">PydynanticError</a></code></p>
+
+
+
+        <p>Raised when a key template references an attribute that is missing.</p>
+
+
+
+
+
+
+
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="pydynantic.MultipleResultsError" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">MultipleResultsError</span>
+
+
+<a href="#pydynantic.MultipleResultsError" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="PydynanticError (pydynantic.errors.PydynanticError)" href="#pydynantic.PydynanticError">PydynanticError</a></code></p>
+
+
+
+        <p>Raised by <code>one</code>/<code>one_or_none</code> when more than one item matches.</p>
+
+
+
+
+
+
+
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="pydynantic.OptimisticLockError" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">OptimisticLockError</span>
+
+
+<a href="#pydynantic.OptimisticLockError" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="ConditionCheckFailedError (pydynantic.errors.ConditionCheckFailedError)" href="#pydynantic.ConditionCheckFailedError">ConditionCheckFailedError</a></code></p>
+
+
+
+        <p>Raised when a versioned write loses an optimistic-locking race.</p>
+
+
+
+
+
+
+
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="pydynantic.PydynanticError" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">PydynanticError</span>
+
+
+<a href="#pydynantic.PydynanticError" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="Exception">Exception</span></code></p>
+
+
+
+        <p>Base class for every error raised by pydynantic.</p>
+
+
+
+
+
+
+
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="pydynantic.TransactionCanceledError" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">TransactionCanceledError</span>
+
+
+<a href="#pydynantic.TransactionCanceledError" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="PydynanticError (pydynantic.errors.PydynanticError)" href="#pydynantic.PydynanticError">PydynanticError</a></code></p>
+
+
+
+        <p>Raised when a <code>TransactWriteItems</code> call is cancelled.</p>
+<p>The per-action cancellation <code>reasons</code> (as returned by DynamoDB) are
+exposed on the <code>reasons</code> attribute for diagnostics.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="pydynantic.ValidationError" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">ValidationError</span>
+
+
+<a href="#pydynantic.ValidationError" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><a class="autorefs autorefs-internal" title="PydynanticError (pydynantic.errors.PydynanticError)" href="#pydynantic.PydynanticError">PydynanticError</a></code></p>
+
+
+
+        <p>Wraps a :class:<code>pydantic.ValidationError</code> for schema violations.</p>
+
+
+
+
+
+
+
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="pydynantic.Condition" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">Condition</span>
+
+
+<a href="#pydynantic.Condition" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>Base class for all expression nodes. Combine with <code>&amp;</code>, <code>|</code>, <code>~</code>.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="pydynantic.F" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">F</span>
+
+
+<a href="#pydynantic.F" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>Reference to an attribute, used to build :class:<code>Condition</code> objects.</p>
+<p>Supports dotted paths for nested map attributes, e.g. <code>F("address.city")</code>.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="pydynantic.KeyDefinition" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">KeyDefinition</span>
+
+
+<a href="#pydynantic.KeyDefinition" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>A primary or secondary-index key declared on an entity's <code>Meta</code>.</p>
+<p>Instances are created by the :func:<code>key</code> factory and bound to a concrete
+:class:<code>~pydynantic.table.Table</code> (which resolves the physical attribute
+names) when the owning entity class is created.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="pydynantic.KeyDefinition.referenced_fields" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">referenced_fields</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+<a href="#pydynantic.KeyDefinition.referenced_fields" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">referenced_fields</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>All entity attributes this key reads, across its pk and sk templates.</p>
+
+    </div>
+
+</div>
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="pydynantic.KeyDefinition.bind" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">bind</span>
+
+
+<a href="#pydynantic.KeyDefinition.bind" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">bind</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">table</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Resolve physical attribute names against the table configuration.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="pydynantic.KeyDefinition.build_pk" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">build_pk</span>
+
+
+<a href="#pydynantic.KeyDefinition.build_pk" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">build_pk</span><span class="p">(</span><span class="n">attrs</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Render the partition-key string from the given attribute values.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="pydynantic.KeyDefinition.build_sk" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">build_sk</span>
+
+
+<a href="#pydynantic.KeyDefinition.build_sk" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">build_sk</span><span class="p">(</span><span class="n">attrs</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Render the sort-key string, or <code>None</code> if this key has no sort key.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="pydynantic.KeyDefinition.key_attributes" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">key_attributes</span>
+
+
+<a href="#pydynantic.KeyDefinition.key_attributes" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">key_attributes</span><span class="p">(</span><span class="n">attrs</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Return the physical key attributes (pk/sk) for an item.</p>
+<p>Returns an empty mapping if the required attributes for this key are not
+all present, which lets non-projected entities skip optional GSIs.</p>
+
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="pydynantic.OperationEvent" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">OperationEvent</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+<a href="#pydynantic.OperationEvent" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>A single DynamoDB operation, reported to an :data:<code>OperationHook</code>.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="pydynantic.Page" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">Page</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+<a href="#pydynantic.Page" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="typing.Generic">Generic</span>[<span title="pydynantic.pagination.T">T</span>]</code></p>
+
+
+
+        <p>A single page of query results plus a cursor for the next page.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+<div class="doc doc-object doc-attribute">
+
+
+
+<h4 id="pydynantic.Page.has_more" class="doc doc-heading">
+            <span class="doc doc-object-name doc-attribute-name">has_more</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-property"><code>property</code></small>
+  </span>
+
+<a href="#pydynantic.Page.has_more" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="n">has_more</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Whether another page is available (a cursor was returned).</p>
+
+    </div>
+
+</div>
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="pydynantic.QueryBuilder" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">QueryBuilder</span>
+
+
+<a href="#pydynantic.QueryBuilder" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="typing.Generic">Generic</span>[<span title="pydynantic.query.E">E</span>]</code></p>
+
+
+
+        <p>Fluent builder for a query against one declared key (primary or GSI).</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="pydynantic.QueryBuilder.eq" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">eq</span>
+
+
+<a href="#pydynantic.QueryBuilder.eq" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">eq</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Match items whose sort key equals <code>value</code>.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="pydynantic.QueryBuilder.lt" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">lt</span>
+
+
+<a href="#pydynantic.QueryBuilder.lt" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">lt</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Match items whose sort key is less than <code>value</code>.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="pydynantic.QueryBuilder.lte" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">lte</span>
+
+
+<a href="#pydynantic.QueryBuilder.lte" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">lte</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Match items whose sort key is less than or equal to <code>value</code>.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="pydynantic.QueryBuilder.gt" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">gt</span>
+
+
+<a href="#pydynantic.QueryBuilder.gt" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">gt</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Match items whose sort key is greater than <code>value</code>.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="pydynantic.QueryBuilder.gte" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">gte</span>
+
+
+<a href="#pydynantic.QueryBuilder.gte" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">gte</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Match items whose sort key is greater than or equal to <code>value</code>.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="pydynantic.QueryBuilder.begins_with" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">begins_with</span>
+
+
+<a href="#pydynantic.QueryBuilder.begins_with" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">begins_with</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Match items whose sort key starts with <code>prefix</code>.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="pydynantic.QueryBuilder.between" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">between</span>
+
+
+<a href="#pydynantic.QueryBuilder.between" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">between</span><span class="p">(</span><span class="n">low</span><span class="p">,</span> <span class="n">high</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Match items whose sort key falls within <code>[low, high]</code> inclusive.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="pydynantic.QueryBuilder.filter" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">filter</span>
+
+
+<a href="#pydynantic.QueryBuilder.filter" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">filter</span><span class="p">(</span><span class="n">condition</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Add a post-read filter expression; chained calls are AND-combined.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="pydynantic.QueryBuilder.limit" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">limit</span>
+
+
+<a href="#pydynantic.QueryBuilder.limit" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">limit</span><span class="p">(</span><span class="n">count</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Cap the number of items DynamoDB evaluates per page at <code>count</code>.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="pydynantic.QueryBuilder.attributes" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">attributes</span>
+
+
+<a href="#pydynantic.QueryBuilder.attributes" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">attributes</span><span class="p">(</span><span class="n">names</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Project only <code>names</code>; omitted fields fall back to model defaults.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="pydynantic.QueryBuilder.ascending" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">ascending</span>
+
+
+<a href="#pydynantic.QueryBuilder.ascending" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">ascending</span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Return results in ascending sort-key order (the DynamoDB default).</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="pydynantic.QueryBuilder.descending" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">descending</span>
+
+
+<a href="#pydynantic.QueryBuilder.descending" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">descending</span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Return results in descending sort-key order.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="pydynantic.QueryBuilder.consistent" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">consistent</span>
+
+
+<a href="#pydynantic.QueryBuilder.consistent" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">consistent</span><span class="p">(</span><span class="n">value</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Request a strongly consistent read. Mirrors <code>get(consistent=...)</code>.</p>
+<p>GSIs only support eventually consistent reads, so requesting a
+consistent read against an index is rejected eagerly.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="pydynantic.QueryBuilder.iter" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">iter</span>
+
+
+<a href="#pydynantic.QueryBuilder.iter" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">iter</span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Lazily iterate all matching items, paginating transparently.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="pydynantic.QueryBuilder.all" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">all</span>
+
+
+<a href="#pydynantic.QueryBuilder.all" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">all</span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Return every matching item as a list.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="pydynantic.QueryBuilder.first" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">first</span>
+
+
+<a href="#pydynantic.QueryBuilder.first" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">first</span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Return the first matching item, or <code>None</code>.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="pydynantic.QueryBuilder.one_or_none" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">one_or_none</span>
+
+
+<a href="#pydynantic.QueryBuilder.one_or_none" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">one_or_none</span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Return the single match, <code>None</code> if none, error if more than one.</p>
+<p>Any user <code>.limit()</code> is ignored: this always probes for a second item
+so the "multiple results" case is never silently masked.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="pydynantic.QueryBuilder.one" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">one</span>
+
+
+<a href="#pydynantic.QueryBuilder.one" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">one</span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Return the single match, raising if zero or more than one.</p>
+<p>Any user <code>.limit()</code> is ignored: this always probes for a second item
+so the "multiple results" case is never silently masked.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="pydynantic.QueryBuilder.page" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">page</span>
+
+
+<a href="#pydynantic.QueryBuilder.page" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">page</span><span class="p">(</span><span class="n">cursor</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Return a single page of results plus an opaque next-page cursor.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="pydynantic.QueryBuilder.count" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">count</span>
+
+
+<a href="#pydynantic.QueryBuilder.count" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">count</span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Count matching items server-side without materialising them.</p>
+
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="pydynantic.QueryNamespace" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">QueryNamespace</span>
+
+
+<a href="#pydynantic.QueryNamespace" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="typing.Generic">Generic</span>[<span title="pydynantic.query.E">E</span>]</code></p>
+
+
+
+        <p><code>Entity.query</code> accessor exposing one builder per declared key.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="pydynantic.ScanBuilder" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">ScanBuilder</span>
+
+
+<a href="#pydynantic.ScanBuilder" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+            <p class="doc doc-class-bases">
+              Bases: <code><span title="typing.Generic">Generic</span>[<span title="pydynantic.query.E">E</span>]</code></p>
+
+
+
+        <p>Fluent builder for a full-table scan restricted to one entity type.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="pydynantic.ScanBuilder.filter" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">filter</span>
+
+
+<a href="#pydynantic.ScanBuilder.filter" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">filter</span><span class="p">(</span><span class="n">condition</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Add a filter expression applied after the scan; chained calls AND-combine.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="pydynantic.ScanBuilder.limit" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">limit</span>
+
+
+<a href="#pydynantic.ScanBuilder.limit" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">limit</span><span class="p">(</span><span class="n">count</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Cap the number of items DynamoDB evaluates per page at <code>count</code>.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="pydynantic.ScanBuilder.attributes" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">attributes</span>
+
+
+<a href="#pydynantic.ScanBuilder.attributes" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">attributes</span><span class="p">(</span><span class="n">names</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Project only <code>names</code>; omitted fields fall back to model defaults.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="pydynantic.ScanBuilder.iter" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">iter</span>
+
+
+<a href="#pydynantic.ScanBuilder.iter" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">iter</span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Lazily iterate matching items, paginating transparently.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="pydynantic.ScanBuilder.all" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">all</span>
+
+
+<a href="#pydynantic.ScanBuilder.all" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">all</span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Return every matching item as a list.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="pydynantic.ScanBuilder.first" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">first</span>
+
+
+<a href="#pydynantic.ScanBuilder.first" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">first</span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Return the first matching item, or <code>None</code>.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="pydynantic.ScanBuilder.page" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">page</span>
+
+
+<a href="#pydynantic.ScanBuilder.page" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">page</span><span class="p">(</span><span class="n">cursor</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Return a single page of results plus an opaque next-page cursor.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="pydynantic.ScanBuilder.count" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">count</span>
+
+
+<a href="#pydynantic.ScanBuilder.count" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">count</span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Count matching items server-side without materialising them.</p>
+
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="pydynantic.Index" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">Index</span>
+
+
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-dataclass"><code>dataclass</code></small>
+  </span>
+
+<a href="#pydynantic.Index" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>A secondary index's physical key attribute names.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="pydynantic.Table" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">Table</span>
+
+
+<a href="#pydynantic.Table" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>Configuration for a single physical DynamoDB table.</p>
+<p>The boto3 client is injected (defaulting to <code>boto3.client("dynamodb")</code>)
+so credentials, region and endpoint stay the caller's concern and tests can
+inject a mocked client.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="pydynantic.Table.register" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">register</span>
+
+
+<a href="#pydynantic.Table.register" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">register</span><span class="p">(</span><span class="n">entity_cls</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Register an entity so items can be routed back to it by <code>__entity__</code>.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="pydynantic.Table.entity_for" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">entity_for</span>
+
+
+<a href="#pydynantic.Table.entity_for" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">entity_for</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Look up a registered entity class by its discriminator name.</p>
+
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+<h3 id="pydynantic.Transaction" class="doc doc-heading">
+            <span class="doc doc-object-name doc-class-name">Transaction</span>
+
+
+<a href="#pydynantic.Transaction" class="headerlink" title="Permanent link">&para;</a></h3>
+
+
+    <div class="doc doc-contents ">
+
+
+
+        <p>Accumulates write actions and flushes them atomically on <code>commit</code>.</p>
+
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="pydynantic.Transaction.put" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">put</span>
+
+
+<a href="#pydynantic.Transaction.put" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">put</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">condition</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Queue a <code>Put</code> action.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="pydynantic.Transaction.delete" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">delete</span>
+
+
+<a href="#pydynantic.Transaction.delete" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">delete</span><span class="p">(</span><span class="n">entity_cls</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">condition</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Queue a <code>Delete</code> action.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="pydynantic.Transaction.condition_check" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">condition_check</span>
+
+
+<a href="#pydynantic.Transaction.condition_check" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">condition_check</span><span class="p">(</span><span class="n">entity_cls</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">condition</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Queue a <code>ConditionCheck</code> action (no write, just a guard).</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="pydynantic.Transaction.update" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">update</span>
+
+
+<a href="#pydynantic.Transaction.update" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">update</span><span class="p">(</span><span class="n">entity_cls</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="nb">set</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">remove</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">add</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">delete</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">condition</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Queue an <code>Update</code> action.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h4 id="pydynantic.Transaction.commit" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">commit</span>
+
+
+<a href="#pydynantic.Transaction.commit" class="headerlink" title="Permanent link">&para;</a></h4>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">commit</span><span class="p">()</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Send all queued actions as a single <code>TransactWriteItems</code> call.</p>
+
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="pydynantic.created_at_attr" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">created_at_attr</span>
+
+
+<a href="#pydynantic.created_at_attr" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">created_at_attr</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Mark a <code>datetime | None</code> field as the auto-managed creation timestamp.</p>
+<p>On the first <code>put</code> (when the field is still <code>None</code>) pydynantic stamps the
+field with <code>datetime.now(timezone.utc)</code>. Subsequent puts leave it untouched,
+and <code>update</code> never modifies it.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="pydynantic.ttl_attr" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">ttl_attr</span>
+
+
+<a href="#pydynantic.ttl_attr" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">ttl_attr</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Mark a field as the DynamoDB Time-To-Live (TTL) attribute.</p>
+<p>DynamoDB requires the TTL attribute to be a Number holding a Unix epoch
+timestamp in seconds. The field may be declared as a <code>datetime | None</code> (the
+common case) or an <code>int</code>; on every <code>put</code> the stored value is overridden to
+an epoch-seconds Number regardless of the model's default ISO datetime
+encoding. Reading back coerces the epoch into a <code>datetime</code> (UTC), so
+sub-second precision is dropped.</p>
+<p>The default is <code>None</code> (TTL is optional). When the value is <code>None</code> the
+attribute is omitted from the stored item entirely.</p>
+<p>Timezone: TTL <code>datetime</code> values should be timezone-aware. Naive datetimes
+are passed to <code>.timestamp()</code> unchanged (interpreted in the local timezone by
+Python); pydynantic does not reinterpret them, so prefer tz-aware values.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="pydynantic.updated_at_attr" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">updated_at_attr</span>
+
+
+<a href="#pydynantic.updated_at_attr" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">updated_at_attr</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Mark a <code>datetime | None</code> field as the auto-managed modification timestamp.</p>
+<p>On every <code>put</code> the field is stamped with <code>datetime.now(timezone.utc)</code>. On
+<code>update</code> it is stamped too, unless the caller explicitly supplies it in
+<code>set=</code> (in which case the caller's value wins).</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="pydynantic.version_attr" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">version_attr</span>
+
+
+<a href="#pydynantic.version_attr" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">version_attr</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Mark an integer field as the optimistic-locking version attribute.</p>
+<p>On every versioned <code>put</code>, the version is incremented and a condition is
+added requiring the stored version to match; a lost race raises
+:class:<code>~pydynantic.errors.OptimisticLockError</code>.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="pydynantic.attr_exists" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">attr_exists</span>
+
+
+<a href="#pydynantic.attr_exists" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">attr_exists</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Convenience: <code>attribute_exists(path)</code>.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="pydynantic.attr_not_exists" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">attr_not_exists</span>
+
+
+<a href="#pydynantic.attr_not_exists" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">attr_not_exists</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Convenience: <code>attribute_not_exists(path)</code> (e.g. create-only puts).</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="pydynantic.key" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">key</span>
+
+
+<a href="#pydynantic.key" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">key</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">pk</span><span class="p">,</span> <span class="n">sk</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Declare a key template for an entity.</p>
+<p>:param pk: partition-key template, e.g. <code>"ORG#{org_id}"</code>.
+:param sk: optional sort-key template, e.g. <code>"USER#{user_id}"</code>.
+:param index: GSI name (from the table's <code>indexes</code>); <code>None</code> = primary.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="pydynantic.decode_cursor" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">decode_cursor</span>
+
+
+<a href="#pydynantic.decode_cursor" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">decode_cursor</span><span class="p">(</span><span class="n">cursor</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Decode an opaque cursor back into a DynamoDB <code>ExclusiveStartKey</code>.</p>
+<p><code>None</code> decodes to <code>None</code>. The cursor must be exactly the opaque,
+versioned token produced by :func:<code>encode_cursor</code> -- it is never
+hand-built. Any malformed, non-JSON, structurally-wrong or
+unsupported-version cursor raises :class:<code>~pydynantic.errors.PydynanticError</code>
+rather than leaking a raw decoding exception.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="pydynantic.encode_cursor" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">encode_cursor</span>
+
+
+<a href="#pydynantic.encode_cursor" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">encode_cursor</span><span class="p">(</span><span class="n">last_evaluated_key</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Encode a DynamoDB <code>LastEvaluatedKey</code> into an opaque cursor string.</p>
+<p>Returns a versioned, base64url-encoded token <strong>without</strong> <code>=</code> padding
+(HTTP/JSON-safe). <code>None</code> or an empty key yields <code>None</code>. The result is
+opaque: pass it back verbatim to resume pagination; do not parse or build
+one by hand.</p>
+
+
+    </div>
+
+</div>
+
+<div class="doc doc-object doc-function">
+
+
+<h3 id="pydynantic.transaction" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">transaction</span>
+
+
+<a href="#pydynantic.transaction" class="headerlink" title="Permanent link">&para;</a></h3>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">transaction</span><span class="p">(</span><span class="n">table</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents ">
+
+        <p>Context manager that commits queued actions on a clean exit.</p>
+<p>If the <code>with</code> block raises, <code>commit</code> is never reached, so no actions are
+sent (rollback). If a queued condition fails at commit time, DynamoDB
+cancels the whole transaction atomically.</p>
+
+
+    </div>
+
+</div>
+
+
+
+  </div>
+
+    </div>
+
+</div><h2 id="re-exported-from-pydantic">Re-exported from Pydantic<a class="headerlink" href="#re-exported-from-pydantic" title="Permanent link">&para;</a></h2>
+<p><code>pydynantic</code> re-exports Pydantic's <a href="https://docs.pydantic.dev/latest/api/fields/#pydantic.fields.Field"><code>Field</code></a>
+for convenience, so you can declare entity attribute metadata without a second import. It
+behaves exactly like <code>pydantic.Field</code>; see the linked Pydantic docs for every parameter.</p>
+
+
+<div class="doc doc-object doc-function">
+
+
+<h2 id="pydantic.Field" class="doc doc-heading">
+            <span class="doc doc-object-name doc-function-name">pydantic.Field</span>
+
+
+<a href="#pydantic.Field" class="headerlink" title="Permanent link">&para;</a></h2>
+          <div class="doc-overloads">
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">Field</span><span class="p">(</span><span class="n">default</span><span class="p">:</span> <span class="n">ellipsis</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">alias</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">alias_priority</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">validation_alias</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">AliasPath</span> <span class="o">|</span> <span class="n">AliasChoices</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">serialization_alias</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">field_title_generator</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">,</span> <span class="n">FieldInfo</span><span class="p">],</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">examples</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">exclude</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">exclude_if</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="nb">bool</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">discriminator</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Discriminator</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">deprecated</span><span class="p">:</span> <span class="n">Deprecated</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">json_schema_extra</span><span class="p">:</span> <span class="n">JsonDict</span> <span class="o">|</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">JsonDict</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">validate_default</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="nb">repr</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">init</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">init_var</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">kw_only</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Pattern</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">strict</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">coerce_numbers_to_str</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">gt</span><span class="p">:</span> <span class="n">SupportsGt</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">ge</span><span class="p">:</span> <span class="n">SupportsGe</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">lt</span><span class="p">:</span> <span class="n">SupportsLt</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">le</span><span class="p">:</span> <span class="n">SupportsLe</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">multiple_of</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">allow_inf_nan</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">max_digits</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">decimal_places</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">min_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">max_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">union_mode</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s1">&#39;smart&#39;</span><span class="p">,</span> <span class="s1">&#39;left_to_right&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">fail_fast</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="o">**</span><span class="n">extra</span><span class="p">:</span> <span class="n">Unpack</span><span class="p">[</span><span class="n">_EmptyKwargs</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Any</span>
+</code></pre></div><div class="doc-signature highlight"><pre><span></span><code><span class="nf">Field</span><span class="p">(</span><span class="n">default</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">alias</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">alias_priority</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">validation_alias</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">AliasPath</span> <span class="o">|</span> <span class="n">AliasChoices</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">serialization_alias</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">field_title_generator</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">,</span> <span class="n">FieldInfo</span><span class="p">],</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">examples</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">exclude</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">exclude_if</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="nb">bool</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">discriminator</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Discriminator</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">deprecated</span><span class="p">:</span> <span class="n">Deprecated</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">json_schema_extra</span><span class="p">:</span> <span class="n">JsonDict</span> <span class="o">|</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">JsonDict</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">validate_default</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">True</span><span class="p">],</span> <span class="nb">repr</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">init</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">init_var</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">kw_only</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Pattern</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">strict</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">coerce_numbers_to_str</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">gt</span><span class="p">:</span> <span class="n">SupportsGt</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">ge</span><span class="p">:</span> <span class="n">SupportsGe</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">lt</span><span class="p">:</span> <span class="n">SupportsLt</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">le</span><span class="p">:</span> <span class="n">SupportsLe</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">multiple_of</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">allow_inf_nan</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">max_digits</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">decimal_places</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">min_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">max_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">union_mode</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s1">&#39;smart&#39;</span><span class="p">,</span> <span class="s1">&#39;left_to_right&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">fail_fast</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="o">**</span><span class="n">extra</span><span class="p">:</span> <span class="n">Unpack</span><span class="p">[</span><span class="n">_EmptyKwargs</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Any</span>
+</code></pre></div><div class="doc-signature highlight"><pre><span></span><code><span class="nf">Field</span><span class="p">(</span><span class="n">default</span><span class="p">:</span> <span class="n">_T</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">alias</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">alias_priority</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">validation_alias</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">AliasPath</span> <span class="o">|</span> <span class="n">AliasChoices</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">serialization_alias</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">field_title_generator</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">,</span> <span class="n">FieldInfo</span><span class="p">],</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">examples</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">exclude</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">exclude_if</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="nb">bool</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">discriminator</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Discriminator</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">deprecated</span><span class="p">:</span> <span class="n">Deprecated</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">json_schema_extra</span><span class="p">:</span> <span class="n">JsonDict</span> <span class="o">|</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">JsonDict</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">validate_default</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">False</span><span class="p">]</span> <span class="o">=</span> <span class="o">...</span><span class="p">,</span> <span class="nb">repr</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">init</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">init_var</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">kw_only</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Pattern</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">strict</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">coerce_numbers_to_str</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">gt</span><span class="p">:</span> <span class="n">SupportsGt</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">ge</span><span class="p">:</span> <span class="n">SupportsGe</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">lt</span><span class="p">:</span> <span class="n">SupportsLt</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">le</span><span class="p">:</span> <span class="n">SupportsLe</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">multiple_of</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">allow_inf_nan</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">max_digits</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">decimal_places</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">min_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">max_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">union_mode</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s1">&#39;smart&#39;</span><span class="p">,</span> <span class="s1">&#39;left_to_right&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">fail_fast</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="o">**</span><span class="n">extra</span><span class="p">:</span> <span class="n">Unpack</span><span class="p">[</span><span class="n">_EmptyKwargs</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">_T</span>
+</code></pre></div><div class="doc-signature highlight"><pre><span></span><code><span class="nf">Field</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">default_factory</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="n">Any</span><span class="p">],</span> <span class="n">alias</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">alias_priority</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">validation_alias</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">AliasPath</span> <span class="o">|</span> <span class="n">AliasChoices</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">serialization_alias</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">field_title_generator</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">,</span> <span class="n">FieldInfo</span><span class="p">],</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">examples</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">exclude</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">exclude_if</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="nb">bool</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">discriminator</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Discriminator</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">deprecated</span><span class="p">:</span> <span class="n">Deprecated</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">json_schema_extra</span><span class="p">:</span> <span class="n">JsonDict</span> <span class="o">|</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">JsonDict</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">validate_default</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">True</span><span class="p">],</span> <span class="nb">repr</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">init</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">init_var</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">kw_only</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Pattern</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">strict</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">coerce_numbers_to_str</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">gt</span><span class="p">:</span> <span class="n">SupportsGt</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">ge</span><span class="p">:</span> <span class="n">SupportsGe</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">lt</span><span class="p">:</span> <span class="n">SupportsLt</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">le</span><span class="p">:</span> <span class="n">SupportsLe</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">multiple_of</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">allow_inf_nan</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">max_digits</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">decimal_places</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">min_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">max_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">union_mode</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s1">&#39;smart&#39;</span><span class="p">,</span> <span class="s1">&#39;left_to_right&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">fail_fast</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="o">**</span><span class="n">extra</span><span class="p">:</span> <span class="n">Unpack</span><span class="p">[</span><span class="n">_EmptyKwargs</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Any</span>
+</code></pre></div><div class="doc-signature highlight"><pre><span></span><code><span class="nf">Field</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">default_factory</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">_T</span><span class="p">]</span> <span class="o">|</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="n">_T</span><span class="p">],</span> <span class="n">alias</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">alias_priority</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">validation_alias</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">AliasPath</span> <span class="o">|</span> <span class="n">AliasChoices</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">serialization_alias</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">field_title_generator</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">,</span> <span class="n">FieldInfo</span><span class="p">],</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">examples</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">exclude</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">exclude_if</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="nb">bool</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">discriminator</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Discriminator</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">deprecated</span><span class="p">:</span> <span class="n">Deprecated</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">json_schema_extra</span><span class="p">:</span> <span class="n">JsonDict</span> <span class="o">|</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">JsonDict</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">validate_default</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="kc">False</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="nb">repr</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">init</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">init_var</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">kw_only</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Pattern</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">strict</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">coerce_numbers_to_str</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">gt</span><span class="p">:</span> <span class="n">SupportsGt</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">ge</span><span class="p">:</span> <span class="n">SupportsGe</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">lt</span><span class="p">:</span> <span class="n">SupportsLt</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">le</span><span class="p">:</span> <span class="n">SupportsLe</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">multiple_of</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">allow_inf_nan</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">max_digits</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">decimal_places</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">min_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">max_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">union_mode</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s1">&#39;smart&#39;</span><span class="p">,</span> <span class="s1">&#39;left_to_right&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">fail_fast</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="o">**</span><span class="n">extra</span><span class="p">:</span> <span class="n">Unpack</span><span class="p">[</span><span class="n">_EmptyKwargs</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">_T</span>
+</code></pre></div><div class="doc-signature highlight"><pre><span></span><code><span class="nf">Field</span><span class="p">(</span><span class="o">*</span><span class="p">,</span> <span class="n">alias</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">alias_priority</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">validation_alias</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">AliasPath</span> <span class="o">|</span> <span class="n">AliasChoices</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">serialization_alias</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">title</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">field_title_generator</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="nb">str</span><span class="p">,</span> <span class="n">FieldInfo</span><span class="p">],</span> <span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">examples</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">exclude</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">exclude_if</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="nb">bool</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">discriminator</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Discriminator</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">deprecated</span><span class="p">:</span> <span class="n">Deprecated</span> <span class="o">|</span> <span class="nb">str</span> <span class="o">|</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">json_schema_extra</span><span class="p">:</span> <span class="n">JsonDict</span> <span class="o">|</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">JsonDict</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">frozen</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">validate_default</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="nb">repr</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">init</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">init_var</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">kw_only</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">pattern</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="n">Pattern</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">strict</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">coerce_numbers_to_str</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">gt</span><span class="p">:</span> <span class="n">SupportsGt</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">ge</span><span class="p">:</span> <span class="n">SupportsGe</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">lt</span><span class="p">:</span> <span class="n">SupportsLt</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">le</span><span class="p">:</span> <span class="n">SupportsLe</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">multiple_of</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">allow_inf_nan</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">max_digits</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">decimal_places</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">min_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">max_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">union_mode</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s1">&#39;smart&#39;</span><span class="p">,</span> <span class="s1">&#39;left_to_right&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="n">fail_fast</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="n">_Unset</span><span class="p">,</span> <span class="o">**</span><span class="n">extra</span><span class="p">:</span> <span class="n">Unpack</span><span class="p">[</span><span class="n">_EmptyKwargs</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Any</span>
+</code></pre></div>          </div>
+<div class="doc-signature highlight"><pre><span></span><code><span class="nf">Field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="n">PydanticUndefined</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">default_factory</span><span class="o">=</span><span class="n">_Unset</span><span class="p">,</span> <span class="n">alias</span><span class="o">=</span><span class="n">_Unset</span><span class="p">,</span> <span class="n">alias_priority</span><span class="o">=</span><span class="n">_Unset</span><span class="p">,</span> <span class="n">validation_alias</span><span class="o">=</span><span class="n">_Unset</span><span class="p">,</span> <span class="n">serialization_alias</span><span class="o">=</span><span class="n">_Unset</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="n">_Unset</span><span class="p">,</span> <span class="n">field_title_generator</span><span class="o">=</span><span class="n">_Unset</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">_Unset</span><span class="p">,</span> <span class="n">examples</span><span class="o">=</span><span class="n">_Unset</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="n">_Unset</span><span class="p">,</span> <span class="n">exclude_if</span><span class="o">=</span><span class="n">_Unset</span><span class="p">,</span> <span class="n">discriminator</span><span class="o">=</span><span class="n">_Unset</span><span class="p">,</span> <span class="n">deprecated</span><span class="o">=</span><span class="n">_Unset</span><span class="p">,</span> <span class="n">json_schema_extra</span><span class="o">=</span><span class="n">_Unset</span><span class="p">,</span> <span class="n">frozen</span><span class="o">=</span><span class="n">_Unset</span><span class="p">,</span> <span class="n">validate_default</span><span class="o">=</span><span class="n">_Unset</span><span class="p">,</span> <span class="nb">repr</span><span class="o">=</span><span class="n">_Unset</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="n">_Unset</span><span class="p">,</span> <span class="n">init_var</span><span class="o">=</span><span class="n">_Unset</span><span class="p">,</span> <span class="n">kw_only</span><span class="o">=</span><span class="n">_Unset</span><span class="p">,</span> <span class="n">pattern</span><span class="o">=</span><span class="n">_Unset</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="n">_Unset</span><span class="p">,</span> <span class="n">coerce_numbers_to_str</span><span class="o">=</span><span class="n">_Unset</span><span class="p">,</span> <span class="n">gt</span><span class="o">=</span><span class="n">_Unset</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="n">_Unset</span><span class="p">,</span> <span class="n">lt</span><span class="o">=</span><span class="n">_Unset</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="n">_Unset</span><span class="p">,</span> <span class="n">multiple_of</span><span class="o">=</span><span class="n">_Unset</span><span class="p">,</span> <span class="n">allow_inf_nan</span><span class="o">=</span><span class="n">_Unset</span><span class="p">,</span> <span class="n">max_digits</span><span class="o">=</span><span class="n">_Unset</span><span class="p">,</span> <span class="n">decimal_places</span><span class="o">=</span><span class="n">_Unset</span><span class="p">,</span> <span class="n">min_length</span><span class="o">=</span><span class="n">_Unset</span><span class="p">,</span> <span class="n">max_length</span><span class="o">=</span><span class="n">_Unset</span><span class="p">,</span> <span class="n">union_mode</span><span class="o">=</span><span class="n">_Unset</span><span class="p">,</span> <span class="n">fail_fast</span><span class="o">=</span><span class="n">_Unset</span><span class="p">,</span> <span class="o">**</span><span class="n">extra</span><span class="p">)</span>
+</code></pre></div>
+
+    <div class="doc doc-contents first">
+
+
+
+    </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "navigation.tabs", "navigation.top", "content.code.copy", "content.tabs.link"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
