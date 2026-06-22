@@ -46,32 +46,41 @@ class QueryBuilder(Generic[E]):
         return self
 
     def eq(self, value: Any) -> QueryBuilder[E]:
+        """Match items whose sort key equals ``value``."""
         return self._with_sk("=", value)
 
     def lt(self, value: Any) -> QueryBuilder[E]:
+        """Match items whose sort key is less than ``value``."""
         return self._with_sk("<", value)
 
     def lte(self, value: Any) -> QueryBuilder[E]:
+        """Match items whose sort key is less than or equal to ``value``."""
         return self._with_sk("<=", value)
 
     def gt(self, value: Any) -> QueryBuilder[E]:
+        """Match items whose sort key is greater than ``value``."""
         return self._with_sk(">", value)
 
     def gte(self, value: Any) -> QueryBuilder[E]:
+        """Match items whose sort key is greater than or equal to ``value``."""
         return self._with_sk(">=", value)
 
     def begins_with(self, prefix: str) -> QueryBuilder[E]:
+        """Match items whose sort key starts with ``prefix``."""
         return self._with_sk("begins_with", prefix)
 
     def between(self, low: Any, high: Any) -> QueryBuilder[E]:
+        """Match items whose sort key falls within ``[low, high]`` inclusive."""
         return self._with_sk("between", low, high)
 
     # -- modifiers ----------------------------------------------------------
     def filter(self, condition: Condition) -> QueryBuilder[E]:
+        """Add a post-read filter expression; chained calls are AND-combined."""
         self._filter = condition if self._filter is None else (self._filter & condition)
         return self
 
     def limit(self, count: int) -> QueryBuilder[E]:
+        """Cap the number of items DynamoDB evaluates per page at ``count``."""
         self._limit = count
         return self
 
@@ -81,10 +90,12 @@ class QueryBuilder(Generic[E]):
         return self
 
     def ascending(self) -> QueryBuilder[E]:
+        """Return results in ascending sort-key order (the DynamoDB default)."""
         self._forward = True
         return self
 
     def descending(self) -> QueryBuilder[E]:
+        """Return results in descending sort-key order."""
         self._forward = False
         return self
 
@@ -285,10 +296,12 @@ class ScanBuilder(Generic[E]):
         self._projection: list[str] | None = None
 
     def filter(self, condition: Condition) -> ScanBuilder[E]:
+        """Add a filter expression applied after the scan; chained calls AND-combine."""
         self._filter = condition if self._filter is None else (self._filter & condition)
         return self
 
     def limit(self, count: int) -> ScanBuilder[E]:
+        """Cap the number of items DynamoDB evaluates per page at ``count``."""
         self._limit = count
         return self
 

@@ -42,6 +42,7 @@ class OperationEvent:
 
 
 OperationHook = Callable[[OperationEvent], None]
+"""A callable invoked once per DynamoDB operation; receives an :class:`OperationEvent`."""
 
 
 class _ClientProxy:
