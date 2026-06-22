@@ -42,7 +42,8 @@ def test_update_advances_updated_leaves_created(models: object) -> None:
     updated_before = item.updated_at
     assert created is not None and updated_before is not None
 
-    Stamped.update(org_id="o1", stamp_id="s1", set={"org_id": "o1"})
+    # No explicit action needed: the auto-stamp of updated_at is itself a write.
+    Stamped.update(org_id="o1", stamp_id="s1")
 
     fetched = Stamped.get(org_id="o1", stamp_id="s1")
     assert fetched is not None

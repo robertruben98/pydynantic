@@ -56,3 +56,31 @@ def test_update_increments_version(models: object) -> None:
     assert updated is not None
     assert updated.version == 2  # 1 (from put) + 1 (from update)
     assert updated.total == 20.0
+
+
+def test_update_with_matching_expected_version_succeeds(models: object) -> None:
+    Order = models.Order  # type: ignore[attr-defined]
+    Order.put(Order(order_id="o1", customer_id="c1", total=10.0))  # version -> 1
+    updated = Order.update(customer_id="c1", order_id="o1", set={"total": 20.0}, expected_version=1)
+    assert updated is not None
+    assert updated.version == 2
+    assert updated.total == 20.0
+
+
+def test_update_with_stale_expected_version_raises(models: object) -> None:
+    Order = models.Order  # type: ignore[attr-defined]
+    Order.put(Order(order_id="o1", customer_id="c1", total=10.0))  # version -> 1
+    # Someone else advances the version to 2.
+    Order.update(customer_id="c1", order_id="o1", set={"total": 15.0}, expected_version=1)
+    # A caller still believing the version is 1 must fail loudly, not lose the write.
+    with pytest.raises(OptimisticLockError):
+        Order.update(customer_id="c1", order_id="o1", set={"total": 99.0}, expected_version=1)
+    fetched = Order.get(customer_id="c1", order_id="o1")
+    assert fetched is not None and fetched.total == 15.0  # stale write did not land
+
+
+def test_update_expected_version_on_unversioned_entity_raises(models: object) -> None:
+    Membership = models.Membership  # type: ignore[attr-defined]
+    Membership.put(Membership(org_id="o1", user_id="u1", role="member"))
+    with pytest.raises(ValueError):
+        Membership.update(org_id="o1", user_id="u1", set={"role": "admin"}, expected_version=1)

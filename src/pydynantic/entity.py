@@ -410,6 +410,7 @@ class Entity(BaseModel, metaclass=EntityMeta):
         add: dict[str, Any] | None = None,
         delete: dict[str, Any] | None = None,
         condition: Condition | None = None,
+        expected_version: int | None = None,
         return_values: str = "ALL_NEW",
         **key_attrs: Any,
     ) -> Self | None:
@@ -418,7 +419,31 @@ class Entity(BaseModel, metaclass=EntityMeta):
         ``set`` assigns attributes, ``remove`` deletes them, ``add`` performs
         atomic numeric/set additions, ``delete`` removes elements from sets.
         Any GSI key whose source attributes change is recomputed automatically.
+
+        On a versioned entity, pass ``expected_version`` to guard the write with
+        the version you last read: a concurrent change raises
+        :class:`~pydynantic.OptimisticLockError` instead of silently overwriting
+        it. The stored ``version`` is always incremented regardless.
         """
+        version_field = cls.__version_field__
+        if expected_version is not None and version_field is None:
+            raise ValueError(
+                "expected_version= requires a version_attr() field on "
+                f"{cls.__name__}; this entity is not versioned."
+            )
+
+        # The physical primary key is immutable: changing an attribute that feeds
+        # it would desync the body from the stored Key, so refuse rather than
+        # write a half-correct item (delete + re-put to move an item).
+        mutated = {*(set or {}), *(remove or []), *(add or {}), *(delete or {})}
+        pk_sources = cls.__primary_key__.referenced_fields & mutated
+        if pk_sources:
+            raise PydynanticError(
+                f"update() cannot change {sorted(pk_sources)}: these feed the "
+                f"immutable primary key of {cls.__name__}. Delete and re-create "
+                "the item to move it."
+            )
+
         context = ExpressionContext()
         set_items: dict[str, Any] = dict(set or {})
 
@@ -444,10 +469,15 @@ class Entity(BaseModel, metaclass=EntityMeta):
                 )
             set_items.update(key_def.key_attributes(known))
 
-        version_field = cls.__version_field__
         add_items: dict[str, Any] = dict(add or {})
         if version_field is not None and version_field not in add_items:
             add_items[version_field] = 1
+
+        # Optimistic-lock guard: refuse the write if the stored version moved
+        # since the caller last read it.
+        if expected_version is not None and version_field is not None:
+            guard = F(version_field) == expected_version
+            condition = guard if condition is None else (condition & guard)
 
         clauses: list[str] = []
         if set_items:

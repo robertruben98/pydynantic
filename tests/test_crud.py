@@ -137,6 +137,18 @@ def test_update_recomputes_gsi_key_on_status_change(models: object) -> None:
     assert User.query.by_status(org_id="acme", status=Status.ACTIVE).all() == []
 
 
+def test_update_rejects_changing_primary_key_source_attr(models: object) -> None:
+    """Mutating an attribute that feeds the primary key would desync the body
+    from the immutable physical key, so it must raise rather than half-write."""
+    User = models.User  # type: ignore[attr-defined]
+    User.put(make_user(models))
+    # org_id feeds pk="ORG#{org_id}"; user_id feeds sk="USER#{user_id}".
+    with pytest.raises(PydynanticError):
+        User.update(org_id="acme", user_id="u1", set={"org_id": "other"})
+    with pytest.raises(PydynanticError):
+        User.update(org_id="acme", user_id="u1", remove=["user_id"])
+
+
 def test_update_with_condition_failure(models: object) -> None:
     User = models.User  # type: ignore[attr-defined]
     User.put(make_user(models, name="Ana"))

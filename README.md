@@ -188,8 +188,9 @@ class Order(Entity, table=table, name="order"):
         primary = key(pk="CUSTOMER#{customer_id}", sk="ORDER#{order_id}")
 ```
 
-Each versioned `put`/`update` increments `version` and guards on the previous value;
-a lost race raises `OptimisticLockError`.
+A versioned `put` guards on the previous value automatically; a versioned `update` guards
+when you pass `expected_version=` (the value you last read). Either way `version` is
+incremented, and a lost race raises `OptimisticLockError`.
 
 ## Error handling
 

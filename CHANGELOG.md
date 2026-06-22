@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- `expected_version=` on `Entity.update` — opt into optimistic locking on a keyed
+  partial update by passing the version you last read; a concurrent change raises
+  `OptimisticLockError`. (#45)
+
+### Fixed
+- `Entity.update` now refuses to change an attribute that feeds the **primary key**
+  (raising `PydynanticError`) instead of silently desyncing the item body from its
+  immutable physical key. (#46)
+
+### Documentation
+- Optimistic-locking guide and README no longer claim `update` guards on the version
+  automatically; `put` does, `update` requires `expected_version=`. (#45)
+
 ## [1.0.0] - 2026-06-20
 
 First stable release. The public API (everything in `pydynantic.__all__`) is now
