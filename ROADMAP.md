@@ -1,15 +1,19 @@
 # Roadmap to 1.0
 
-`pydynantic` is currently **0.2.0 (alpha)**. The single-table feature set listed
-as *in scope for v1* in the README already exists: entities, key composition,
-CRUD, queries, filters, pagination, batch, transactions, collections and
-optimistic locking. The road to **1.0 is about hardening, not net-new surface**:
-locking down the public API, closing correctness gaps, and shipping the docs and
-quality gates expected of a library you'd pin in production.
+> **Status: shipped.** `pydynantic` reached **1.0.0** — every item below is done.
+> This file is kept as the record of what 1.0 promised. New work lives in the
+> issue tracker and `CHANGELOG.md`.
 
-`1.0` is a promise of **API stability** — once tagged, the public surface follows
-semver and breaking changes wait for `2.0`. Everything below exists to make that
-promise safe to keep.
+The road to **1.0 was about hardening, not net-new surface**: the single-table
+feature set listed as *in scope for v1* in the README (entities, key composition,
+CRUD, queries, filters, pagination, batch, transactions, collections and
+optimistic locking) already existed. 1.0 locked down the public API, closed
+correctness gaps, and shipped the docs and quality gates expected of a library
+you'd pin in production.
+
+`1.0` is a promise of **API stability** — now that it is tagged, the public
+surface follows semver and breaking changes wait for `2.0`. Everything below
+existed to make that promise safe to keep.
 
 ## Guiding principles
 

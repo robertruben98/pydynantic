@@ -262,6 +262,28 @@ def test_get_or_raise_returns_existing(models: object) -> None:
     assert fetched.user_id == "u1"
 
 
+def test_get_or_raise_forwards_consistent_and_attributes(models: object, monkeypatch: Any) -> None:
+    """get_or_raise should expose the same read options as get()."""
+    User = models.User  # type: ignore[attr-defined]
+    User.put(make_user(models))
+    seen: dict[str, Any] = {}
+    real_get_item = User.__entity_table__.client.get_item
+
+    def spy_get_item(**kwargs: Any) -> Any:
+        seen.update(kwargs)
+        return real_get_item(**kwargs)
+
+    monkeypatch.setattr(User.__entity_table__.client, "get_item", spy_get_item)
+    User.get_or_raise(
+        org_id="acme",
+        user_id="u1",
+        consistent=True,
+        attributes=["user_id", "org_id", "email", "name"],
+    )
+    assert seen["ConsistentRead"] is True
+    assert "ProjectionExpression" in seen
+
+
 def test_delete_with_valueless_condition(models: object) -> None:
     """A condition with no expression values still deletes (covers no-values branch)."""
     User = models.User  # type: ignore[attr-defined]
