@@ -1,6 +1,7 @@
 # pydynantic
 
 [![PyPI version](https://img.shields.io/pypi/v/pydynantic.svg)](https://pypi.org/project/pydynantic/)
+[![Docs](https://img.shields.io/badge/docs-online-blue)](https://robertruben98.github.io/pydynantic/)
 [![Python versions](https://img.shields.io/pypi/pyversions/pydynantic.svg)](https://pypi.org/project/pydynantic/)
 [![CI](https://github.com/robertruben98/pydynantic/actions/workflows/ci.yml/badge.svg)](https://github.com/robertruben98/pydynantic/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/robertruben98/pydynantic/branch/main/graph/badge.svg)](https://codecov.io/gh/robertruben98/pydynantic)
