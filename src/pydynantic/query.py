@@ -158,8 +158,12 @@ class QueryBuilder(Generic[E]):
         start_key: dict[str, Any] | None = None
         while True:
             page_params = dict(params)
+            # DynamoDB's Limit caps items *examined*, not items returned. With a
+            # FilterExpression the two differ, so shrinking Limit to the post-filter
+            # remaining narrows the scan window each page and over-issues round-trips.
+            # Without a filter, examined == returned, so shrink to exactly remaining.
             if remaining is not None:
-                page_params["Limit"] = remaining
+                page_params["Limit"] = self._limit if self._filter is not None else remaining
             if start_key is not None:
                 page_params["ExclusiveStartKey"] = start_key
             response = client.query(**page_params)
@@ -260,6 +264,9 @@ class QueryBuilder(Generic[E]):
                 page_params["ExclusiveStartKey"] = start_key
             response = client.query(**page_params)
             total += int(response.get("Count", 0))
+            # Honour .limit() like the other terminals: cap the reported count.
+            if self._limit is not None and total >= self._limit:
+                return self._limit
             start_key = response.get("LastEvaluatedKey")
             if not start_key:
                 return total
@@ -335,8 +342,12 @@ class ScanBuilder(Generic[E]):
         start_key: dict[str, Any] | None = None
         while True:
             page_params = dict(params)
+            # A scan always carries the entity discriminator as a FilterExpression,
+            # so examined != returned. Cap each page at the constant requested limit
+            # rather than the shrinking post-filter remaining (which over-issues
+            # round-trips); stop yielding once the limit is reached.
             if remaining is not None:
-                page_params["Limit"] = remaining
+                page_params["Limit"] = self._limit
             if start_key is not None:
                 page_params["ExclusiveStartKey"] = start_key
             response = client.scan(**page_params)
@@ -387,6 +398,9 @@ class ScanBuilder(Generic[E]):
                 page_params["ExclusiveStartKey"] = start_key
             response = client.scan(**page_params)
             total += int(response.get("Count", 0))
+            # Honour .limit() like the other terminals: cap the reported count.
+            if self._limit is not None and total >= self._limit:
+                return self._limit
             start_key = response.get("LastEvaluatedKey")
             if not start_key:
                 return total

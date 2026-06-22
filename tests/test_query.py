@@ -173,6 +173,15 @@ def test_query_count(models: object) -> None:
     assert q.primary(org_id="ghost").count() == 0
 
 
+def test_query_count_respects_limit(models: object) -> None:
+    seed(models, 5)
+    q = models.User.query  # type: ignore[attr-defined]
+    # limit caps the reported count, like every other terminal honours .limit().
+    assert q.primary(org_id="acme").limit(2).count() == 2
+    # a limit above the match total is a no-op.
+    assert q.primary(org_id="acme").limit(10).count() == 5
+
+
 def test_query_projection(models: object) -> None:
     seed(models, 1)
     user = (
@@ -287,6 +296,47 @@ def test_fetch_two_paginates(models: object, monkeypatch: Any) -> None:
     _two_pages_query(models, monkeypatch, [_raw_user(models, 1)], [_raw_user(models, 2)])
     with pytest.raises(MultipleResultsError):
         models.User.query.primary(org_id="acme").one_or_none()  # type: ignore[attr-defined]
+
+
+def test_query_iter_filter_limit_does_not_shrink_pages(models: object, monkeypatch: Any) -> None:
+    # With a FilterExpression, DynamoDB's Limit caps items *examined*, not items
+    # returned. Shrinking Limit to the post-filter remaining narrows the scan window
+    # each page and over-issues round-trips, so iter() must hold Limit at the constant
+    # requested value (2), not 2 then 1.
+    client = models.table.client  # type: ignore[attr-defined]
+    seen_limits: list[Any] = []
+
+    def fake_query(**kwargs: Any) -> Any:
+        seen_limits.append(kwargs.get("Limit"))
+        if len(seen_limits) == 1:
+            return {"Items": [_raw_user(models, 1)], "LastEvaluatedKey": {"PK": {"S": "x"}}}
+        return {"Items": [_raw_user(models, 2)]}
+
+    monkeypatch.setattr(client, "query", fake_query)
+    users = (
+        models.User.query.primary(org_id="acme")  # type: ignore[attr-defined]
+        .filter(F("login_count") > 0)
+        .limit(2)
+        .all()
+    )
+    assert len(users) == 2
+    assert seen_limits == [2, 2]  # constant page cap while filtering, not 2 then 1
+
+
+def test_query_iter_limit_without_filter_still_caps_per_page(
+    models: object, monkeypatch: Any
+) -> None:
+    # No filter: items returned == items examined, so Limit=remaining is correct.
+    client = models.table.client  # type: ignore[attr-defined]
+    seen_limits: list[Any] = []
+
+    def fake_query(**kwargs: Any) -> Any:
+        seen_limits.append(kwargs.get("Limit"))
+        return {"Items": [_raw_user(models, 1)]}
+
+    monkeypatch.setattr(client, "query", fake_query)
+    models.User.query.primary(org_id="acme").limit(3).all()  # type: ignore[attr-defined]
+    assert seen_limits == [3]
 
 
 def test_query_count_paginates(models: object, monkeypatch: Any) -> None:

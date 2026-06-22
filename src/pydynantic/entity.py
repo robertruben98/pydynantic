@@ -348,11 +348,21 @@ class Entity(BaseModel, metaclass=EntityMeta):
         return cls.from_dynamo(item)
 
     @classmethod
-    def get_or_raise(cls, **key_attrs: Any) -> Self:
-        """Like :meth:`get` but raises :class:`ItemNotFoundError` when missing."""
+    def get_or_raise(
+        cls,
+        *,
+        consistent: bool = False,
+        attributes: list[str] | None = None,
+        **key_attrs: Any,
+    ) -> Self:
+        """Like :meth:`get` but raises :class:`ItemNotFoundError` when missing.
+
+        Accepts the same ``consistent`` and ``attributes`` read options as
+        :meth:`get`.
+        """
         from .errors import ItemNotFoundError
 
-        result = cls.get(**key_attrs)
+        result = cls.get(consistent=consistent, attributes=attributes, **key_attrs)
         if result is None:
             raise ItemNotFoundError(f"{cls.__name__} not found for {key_attrs}")
         return result

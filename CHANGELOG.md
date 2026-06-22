@@ -11,11 +11,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `expected_version=` on `Entity.update` — opt into optimistic locking on a keyed
   partial update by passing the version you last read; a concurrent change raises
   `OptimisticLockError`. (#45)
+- `consistent=` and `attributes=` on `Entity.get_or_raise` — read-option parity
+  with `Entity.get`. (#43)
 
 ### Fixed
 - `Entity.update` now refuses to change an attribute that feeds the **primary key**
   (raising `PydynanticError`) instead of silently desyncing the item body from its
   immutable physical key. (#46)
+- `QueryBuilder.count`/`ScanBuilder.count` now honour `.limit()`, capping the
+  reported count like every other terminal. (#43)
+- `QueryBuilder.iter`/`ScanBuilder.iter` no longer shrink the per-page `Limit` to
+  the post-filter remaining when a filter is present, which over-issued round-trips;
+  the page cap stays at the requested limit. (#43)
 
 ### Documentation
 - Optimistic-locking guide and README no longer claim `update` guards on the version
